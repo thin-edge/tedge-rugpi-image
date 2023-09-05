@@ -30,8 +30,11 @@ jobs:
       - name: Bake Image
         run: ./run-bakery bake build/customized.tar build/customized.img
 
+      - name: Compress Image
+        run: xz -z build/customized.img
+
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
-          name: customized.img
-          path: build/customized.img
+          name: customized.img.xz
+          path: build/customized.img.xz
