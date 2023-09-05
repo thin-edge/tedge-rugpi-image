@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DOCKER=${DOCKER:-docker}
+
+$DOCKER run --rm --privileged \
+    -v "$(pwd)":/project \
+    -v /dev:/dev \
+    ghcr.io/silitics/rugpi-bakery:latest \
+    "$@"

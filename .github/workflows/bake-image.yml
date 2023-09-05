@@ -1,0 +1,37 @@
+name: Bake Image
+
+on:
+  push:
+    branches:
+      - main
+      - ci
+
+env:
+  PI_BASE_IMAGE: "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-05-03/2023-05-03-raspios-bullseye-arm64-lite.img.xz"
+
+jobs:  
+  bake-image:
+    name: Bake Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install QEMU
+        run: docker run --privileged --rm tonistiigi/binfmt --install arm64
+
+      - name: Extract Image
+        run: ./run-bakery extract ${{ env.PI_BASE_IMAGE }} build/base.tar
+      
+      - name: Customize System
+        run: ./run-bakery customize build/base.tar build/customized.tar
+      
+      - name: Bake Image
+        run: ./run-bakery bake build/customized.tar build/customized.img
+
+      - name: Upload Image
+        uses: actions/upload-artifact@v3
+        with:
+          name: customized.img
+          path: build/customized.img
