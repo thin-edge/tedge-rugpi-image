@@ -31,7 +31,7 @@ jobs:
         run: ./run-bakery bake build/customized.tar build/customized.img
 
       - name: Compress Image
-        run: xz -z build/customized.img
+        run: sudo xz -z build/customized.img
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
