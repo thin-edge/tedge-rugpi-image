@@ -3,6 +3,8 @@ set -eu
 
 HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
 DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
+DEVICE_ID="$(tedge config get device.id)"
+TARGET="$(tedge config get mqtt.topic_root)/$(tedge config get mqtt.device_topic_id)"
 
 echo "Current rugpi-ctrl state:" >&2
 /usr/bin/rugpi-ctrl system info >&2
@@ -18,7 +20,7 @@ is_healthy() {
     healthy=0
     if command -V run-parts >/dev/null 2>&1; then
         echo "Using run-parts to execute scripts in $HEALTH_CHECK_DIR" >&2
-        if ! run-parts --exit-on-error --new-session --verbose "$HEALTH_CHECK_DIR"; then
+        if ! run-parts --exit-on-error --new-session --lsbsysinit --verbose "$HEALTH_CHECK_DIR"; then
             healthy=1
         fi
     else
@@ -28,6 +30,53 @@ is_healthy() {
     fi
 
     return "$healthy"
+}
+
+collect_rugpi() {
+    if [ -z "$DEVICE_ID" ]; then
+        return 0
+    fi
+    # Collect rugpi state information, e.g. which partition is active
+    HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
+    DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
+
+    # TODO: Change to te topic once inventory updates are supported
+    # c8y payload
+    PAYLOAD=$(printf '{"rugpi":{"hot":"%s","default":"%s"}}' "$HOT" "$DEFAULT")
+    tedge mqtt pub "c8y/inventory/managedObjects/update/$DEVICE_ID" "$PAYLOAD"
+
+    # publish to tedge api which is not yet supported
+    PAYLOAD=$(printf '{"hot":"%s","default":"%s"}' "$HOT" "$DEFAULT")
+    tedge mqtt pub "$TARGET/data/rugpi" "$PAYLOAD"
+
+    # publish event for chronological order
+    PAYLOAD=$(printf '{"text":"Partition info. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
+    tedge mqtt pub "$TARGET/e/device_boot" "$PAYLOAD"
+}
+
+collect_os_info() {
+    if [ -z "$DEVICE_ID" ]; then
+        return 0
+    fi
+
+    # Collect Operating System information
+    if [ -f /etc/os-release ]; then
+        # shellcheck disable=SC1091
+        . /etc/os-release || true
+
+        # TODO: Change to te topic once inventory updates are supported
+        PAYLOAD=$(printf '{"device_OS":{"family":"%s","version":"%s"}}' "$NAME" "${VERSION:-$VERSION_ID}")
+        tedge mqtt pub "c8y/inventory/managedObjects/update/$DEVICE_ID" "$PAYLOAD"
+
+        # publish to tedge api which is not yet supported
+        PAYLOAD=$(printf '{"family":"%s","version":"%s"}' "$NAME" "${VERSION:-$VERSION_ID}")
+        tedge mqtt pub --retain "$TARGET/data/device_OS" "$PAYLOAD"
+    fi
+}
+
+publish_system_info() {
+    collect_rugpi
+    collect_os_info
 }
 
 main() {
@@ -56,10 +105,13 @@ main() {
 
     echo "Making Hot partition the default partition: $DEFAULT" >&2
     /usr/bin/rugpi-ctrl system commit
+
+    publish_system_info
 }
 
 if ! needs_commit; then
-    echo "Already on default partition. No commit/rollback needed" >&2
+    echo "Already on default partition. No commit/rollback needed. hot=$HOT, default=$DEFAULT" >&2
+    publish_system_info
     exit 0
 fi
 

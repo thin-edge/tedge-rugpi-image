@@ -1,5 +1,5 @@
 [Unit]
-Description=Rollback the currently booted system if thin-edge.io can not connect successfully
+Description=Rollback the currently booted system if thin-edge.io cannot connect successfully
 
 [Service]
 Type=oneshot
