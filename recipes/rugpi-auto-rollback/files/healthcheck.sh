@@ -2,7 +2,7 @@
 set -eu
 
 HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
-DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2)
+DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
 
 echo "Current rugpi-ctrl state:" >&2
 /usr/bin/rugpi-ctrl system info >&2
@@ -10,7 +10,7 @@ echo "Current rugpi-ctrl state:" >&2
 HEALTH_CHECK_DIR=/etc/health.d
 
 needs_commit() {
-    [ "$HOT" = "$DEFAULT" ]
+    [ "$HOT" != "$DEFAULT" ]
 }
 
 is_healthy() {
