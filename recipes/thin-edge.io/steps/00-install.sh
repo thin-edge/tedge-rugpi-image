@@ -10,3 +10,7 @@ apt-get install -y c8y-command-plugin
 
 # Enable network manager by default
 systemctl enable NetworkManager || true
+
+# Enable services by default to have sensible default settings once tedge is configured
+systemctl enable tedge-agent
+systemctl enable tedge-mapper-c8y
