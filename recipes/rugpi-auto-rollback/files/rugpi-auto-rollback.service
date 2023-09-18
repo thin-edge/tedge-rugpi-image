@@ -1,0 +1,9 @@
+[Unit]
+Description=Rollback the currently booted system if thin-edge.io can not connect successfully
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/healthcheck.sh
+
+[Install]
+WantedBy=multi-user.target

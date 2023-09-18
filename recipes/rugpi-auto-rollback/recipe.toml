@@ -1,0 +1,2 @@
+description = "enabling Rugpi Ctrl auto rollback"
+priority = 80_000
