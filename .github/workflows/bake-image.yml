@@ -18,6 +18,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Set image name
+        run: echo "IMAGE_NAME=rpi4_tedge_$(date +'%Y-%m-%d-%H%M').img" >> $GITHUB_ENV
+
       - name: Install QEMU
         run: docker run --privileged --rm tonistiigi/binfmt --install arm64
 
@@ -28,13 +31,11 @@ jobs:
         run: ./run-bakery customize build/base.tar build/customized.tar
       
       - name: Bake Image
-        run: ./run-bakery bake build/customized.tar build/customized.img
-
-      - name: Compress Image
-        run: sudo xz -z build/customized.img
+        run:
+          ./run-bakery bake build/customized.tar build/${{ env.IMAGE_NAME }}
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
-          name: customized.img.xz
-          path: build/customized.img.xz
+          name: ${{ env.IMAGE_NAME }}
+          path: build/${{ env.IMAGE_NAME }}
