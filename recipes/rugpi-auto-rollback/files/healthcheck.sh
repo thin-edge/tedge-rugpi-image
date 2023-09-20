@@ -11,6 +11,14 @@ echo "Current rugpi-ctrl state:" >&2
 
 HEALTH_CHECK_DIR=/etc/health.d
 
+hot_part() {
+    /usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs
+}
+
+default_part() {
+    /usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs
+}
+
 needs_commit() {
     [ "$HOT" != "$DEFAULT" ]
 }
@@ -37,8 +45,6 @@ collect_rugpi() {
         return 0
     fi
     # Collect rugpi state information, e.g. which partition is active
-    HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
-    DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
 
     # TODO: Change to te topic once inventory updates are supported
     # c8y payload
@@ -123,12 +129,23 @@ main() {
 
     if [ "$COMMIT" = "0" ]; then
         echo "Switching back to default partition: $DEFAULT" >&2
+        PAYLOAD=$(printf '{"text":"Health check failed. Rolling back to default partition. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
+        tedge mqtt pub "$TARGET/e/image_rollback" "$PAYLOAD" ||:
+
         /usr/bin/rugpi-ctrl system reboot
         exit 0
     fi
 
     echo "Making Hot partition the default partition: $DEFAULT" >&2
     /usr/bin/rugpi-ctrl system commit
+
+    # Refresh hot/default partition info as they change after a commit
+    HOT=$(hot_part)
+    DEFAULT=$(default_part)
+
+    # Send notification that the image was committed
+    PAYLOAD=$(printf '{"text":"Health check passed. Changing default partition. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
+    tedge mqtt pub "$TARGET/e/image_commit" "$PAYLOAD" ||:
 
     publish_system_info
 }
