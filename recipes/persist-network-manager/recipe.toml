@@ -1,0 +1,2 @@
+description = "install state file for `/etc/NetworkManager/system-connections`"
+priority = 600_000  # Execute rather early.
