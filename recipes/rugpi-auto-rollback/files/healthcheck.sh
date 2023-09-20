@@ -99,6 +99,13 @@ publish_system_info() {
 main() {
     counter=0
     COMMIT=0
+
+    # Wait for broker before checking health, but don't block the health check
+    try_wait_for_broker
+
+    PAYLOAD=$(printf '{"text":"Booted into new image. Checking health before committing. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
+    tedge mqtt pub "$TARGET/e/image_check" "$PAYLOAD" ||:
+
     while [ "$counter" -lt 10 ]; do
         if is_healthy; then
             COMMIT=1
