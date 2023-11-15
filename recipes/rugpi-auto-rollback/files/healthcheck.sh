@@ -45,19 +45,12 @@ collect_rugpi() {
         return 0
     fi
     # Collect rugpi state information, e.g. which partition is active
-
-    # TODO: Change to te topic once inventory updates are supported
-    # c8y payload
-    PAYLOAD=$(printf '{"rugpi":{"hot":"%s","default":"%s"}}' "$HOT" "$DEFAULT")
-    tedge mqtt pub "c8y/inventory/managedObjects/update/$DEVICE_ID" "$PAYLOAD" ||:
-
-    # publish to tedge api which is not yet supported
     PAYLOAD=$(printf '{"hot":"%s","default":"%s"}' "$HOT" "$DEFAULT")
-    tedge mqtt pub "$TARGET/data/rugpi" "$PAYLOAD" ||:
+    tedge mqtt pub -q 1 -r "$TARGET/twin/rugpi" "$PAYLOAD" ||:
 
     # publish event for chronological order
     PAYLOAD=$(printf '{"text":"Partition info. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
-    tedge mqtt pub "$TARGET/e/device_boot" "$PAYLOAD" ||:
+    tedge mqtt pub -q 1 "$TARGET/e/device_boot" "$PAYLOAD" ||:
 }
 
 collect_os_info() {
@@ -70,13 +63,9 @@ collect_os_info() {
         # shellcheck disable=SC1091
         . /etc/os-release ||:
 
-        # TODO: Change to te topic once inventory updates are supported
-        PAYLOAD=$(printf '{"device_OS":{"family":"%s","version":"%s"}}' "$NAME" "${VERSION:-$VERSION_ID}")
-        tedge mqtt pub "c8y/inventory/managedObjects/update/$DEVICE_ID" "$PAYLOAD" ||:
-
         # publish to tedge api which is not yet supported
         PAYLOAD=$(printf '{"family":"%s","version":"%s"}' "$NAME" "${VERSION:-$VERSION_ID}")
-        tedge mqtt pub --retain "$TARGET/data/device_OS" "$PAYLOAD" ||:
+        tedge mqtt pub --retain "$TARGET/twin/device_OS" "$PAYLOAD" ||:
     fi
 }
 
@@ -110,7 +99,7 @@ main() {
     try_wait_for_broker
 
     PAYLOAD=$(printf '{"text":"Booted into new image. Checking health before committing. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
-    tedge mqtt pub "$TARGET/e/image_check" "$PAYLOAD" ||:
+    tedge mqtt pub -q 1 "$TARGET/e/image_check" "$PAYLOAD" ||:
 
     while [ "$counter" -lt 10 ]; do
         if is_healthy; then
@@ -130,7 +119,7 @@ main() {
     if [ "$COMMIT" = "0" ]; then
         echo "Switching back to default partition: $DEFAULT" >&2
         PAYLOAD=$(printf '{"text":"Health check failed. Rolling back to default partition. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
-        tedge mqtt pub "$TARGET/e/image_rollback" "$PAYLOAD" ||:
+        tedge mqtt pub -q 1 "$TARGET/e/image_rollback" "$PAYLOAD" ||:
 
         /usr/bin/rugpi-ctrl system reboot
         exit 0

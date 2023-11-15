@@ -1,0 +1,11 @@
+[Unit]
+Description=Set hostname on startup
+Wants=network-pre.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/set-hostname.sh
+
+[Install]
+WantedBy=multi-user.target
