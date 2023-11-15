@@ -1,5 +1,8 @@
-recipes = ["set-hostname-from-serial", "persist-root-home", "ssh", "zsh"]
+recipes = ["set-hostname", "persist-root-home", "ssh", "zsh"]
 exclude = ["pi-cleanup"]
+
+[parameters.set-hostname]
+hostname = "tedge-rugpi.local"
 
 [parameters.apt-cleanup]
 autoremove = true
