@@ -1,7 +1,4 @@
-recipes = ["set-hostname", "persist-root-home", "ssh", "zsh"]
-
-[parameters.set-hostname]
-hostname = "pippin.local"
+recipes = ["set-hostname-from-serial", "persist-root-home", "ssh", "zsh"]
 
 [parameters.apt-cleanup]
 autoremove = true
