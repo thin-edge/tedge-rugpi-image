@@ -13,3 +13,8 @@
 2. Flash the `build/image.img` image to the Raspberry Pi
 
 For further information, checkout the [Rugpi quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
+
+* [ ] Sensible configuration file defaults
+    * configuration
+    * log
+* [ ] Set hostname based on hardware

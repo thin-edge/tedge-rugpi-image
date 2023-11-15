@@ -1,4 +1,5 @@
 recipes = ["set-hostname-from-serial", "persist-root-home", "ssh", "zsh"]
+exclude = ["pi-cleanup"]
 
 [parameters.apt-cleanup]
 autoremove = true
