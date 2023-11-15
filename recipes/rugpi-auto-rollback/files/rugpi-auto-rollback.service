@@ -4,6 +4,8 @@ Description=Rollback the currently booted system if thin-edge.io cannot connect 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/healthcheck.sh
+StandardOutput=append:/etc/tedge/healthcheck.out.log
+StandardError=append:/etc/tedge/healthcheck.err.log
 
 [Install]
 WantedBy=multi-user.target
