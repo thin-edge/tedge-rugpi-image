@@ -1,41 +1,47 @@
 #!/bin/sh
 set -e
 
-HARDWARE=$(cat /proc/cpuinfo  | grep Serial | cut -d: -f2 | xargs)
+MODEL=$(cat /proc/cpuinfo  | grep Model | cut -d: -f2 | xargs)
 SERIAL_NO=$(cat /proc/cpuinfo  | grep Serial | cut -d: -f2 | xargs)
-#MODEL=$(cat /proc/cpuinfo  | grep Model | cut -d: -f2- | xargs)
 
-MODEL_HUMAN=
+MODEL_PREFIX=
 IMAGE_FAMILY=rugpi
 
-case "$HARDWARE" in
+case "$MODEL" in
     Raspberry\ Pi\ 5*)
-        MODEL_HUMAN=rpi5
+        MODEL_PREFIX=rpi5
         ;;
     Raspberry\ Pi\ 4*)
-        MODEL_HUMAN=rpi4
+        MODEL_PREFIX=rpi4
         ;;
     Raspberry\ Pi\ 3*)
-        MODEL_HUMAN=rpi3
+        MODEL_PREFIX=rpi3
         ;;
     Raspberry\ Pi\ 2\ Rev*)
-        MODEL_HUMAN=rpi2
+        MODEL_PREFIX=rpi2
         ;;
     Raspberry\ Pi\ Model*)
-        MODEL_HUMAN=rpi1
+        MODEL_PREFIX=rpi1
         ;;
     Raspberry\ Pi\ Zero\ 2\ W\ Rev*)
-        MODEL_HUMAN=rpizero2
+        MODEL_PREFIX=rpizero2
         ;;
     Raspberry\ Pi\ Zero\ W\ Rev*)
-        MODEL_HUMAN=rpizero
+        MODEL_PREFIX=rpizero
         ;;
     *)
-        MODEL_HUMAN=unknown
+        MODEL_PREFIX=unknown
         ;;
 esac
 
-echo "${MODEL_HUMAN}_${IMAGE_FAMILY}_${SERIAL_NO}" > /etc/hostname
+NEW_HOSTNAME="${MODEL_PREFIX}-${IMAGE_FAMILY}-${SERIAL_NO}"
+echo "Detected model: $MODEL"
+echo "Detected serial no.: $SERIAL_NO"
+echo "Using model prefix: $MODEL_PREFIX"
+echo "Setting new hostname based on hardware: $NEW_HOSTNAME"
+
+# Host name may only contain a-z, 0-9 and - (hypens)
+echo "${MODEL_PREFIX}-${IMAGE_FAMILY}-${SERIAL_NO}" > /etc/hostname
 
 # cat > /etc/hosts << EOF
 # 127.0.0.1       localhost
