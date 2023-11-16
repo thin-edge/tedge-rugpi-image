@@ -1,2 +1,3 @@
 description = "sets the hostname from serial number"
 priority = 90_000
+default = false
