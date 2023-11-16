@@ -6,9 +6,6 @@ DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
 DEVICE_ID="$(tedge config get device.id)"
 TARGET="$(tedge config get mqtt.topic_root)/$(tedge config get mqtt.device_topic_id)"
 
-echo "Waiting 10 minutes before checking health:" >&2
-sleep 600
-
 echo "Current rugpi-ctrl state:" >&2
 /usr/bin/rugpi-ctrl system info >&2
 
@@ -103,6 +100,10 @@ main() {
 
     PAYLOAD=$(printf '{"text":"Booted into new image. Checking health before committing. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
     tedge mqtt pub -q 1 "$TARGET/e/image_check" "$PAYLOAD" ||:
+
+    # DEBUG: Give a chance to manually intercept this
+    echo "Waiting 10 minutes before checking health:" >&2
+    sleep 600
 
     while [ "$counter" -lt 10 ]; do
         if is_healthy; then
