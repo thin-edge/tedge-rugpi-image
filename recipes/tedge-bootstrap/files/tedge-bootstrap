@@ -1,0 +1,62 @@
+#!/bin/sh
+set -e
+
+if tedge cert show >/dev/null 2>&1; then
+    echo "tedge device certificate has already been created" >&2
+
+    echo "If your device is still not connected, try uploading the cert using:" >&2
+    echo ""  >&2
+    echo "  tedge cert upload c8y --user <your_username>"  >&2
+    echo ""  >&2
+    exit 0
+fi
+
+create_cert() {
+    DEVICE_ID="$(tedge-identity)"
+    tedge cert create --device-id "$DEVICE_ID"
+}
+
+configure_c8y() {
+    if [ -n "$1" ]; then
+        C8Y_URL="$1"
+    else
+        printf "Enter your Cumulocity IoT url:\n"
+        read -r C8Y_URL
+
+        if [ -z "$C8Y_URL" ]; then
+            return
+        fi
+
+        # trim the http:// or https:// prefix
+        C8Y_URL=$(echo "$C8Y_URL" | sed 's|^https*://||g')
+        tedge config set c8y.url "$C8Y_URL"
+    fi
+
+    printf "Do you want to upload the Certificate to Cumulocity IoT? [Y/n]: "
+    read -r UPLOAD_CERT
+    case "${UPLOAD_CERT:-Y}" in
+        Y|y|yes)
+            ;;
+        N|n|no)
+            return
+            ;;
+    esac
+
+    printf "Enter your Cumulocity IoT username (must have Tenant Manager Role):\n"
+    read -r C8Y_USER
+
+    if [ -n "$C8Y_USER" ]; then
+        tedge cert upload c8y --user "$C8Y_USER"
+    else
+        echo "" >&2
+    fi
+
+    tedge connect c8y
+}
+
+if [ $# -gt 0 ]; then
+    C8Y_URL="$1"
+fi
+
+create_cert
+configure_c8y "$C8Y_URL"
