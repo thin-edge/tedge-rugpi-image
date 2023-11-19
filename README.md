@@ -4,7 +4,8 @@ The repository can be used to build custom Raspberry Pi images with thin-edge.io
 
 **Compatible devices**
 
-* Raspberry Pi 4 only!
+* Raspberry Pi 4
+* Raspberry Pi 5
 
 ## Building the image
 
@@ -16,6 +17,6 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     just build-all
     ```
 
-2. Flash the `build/image.img` image to the Raspberry Pi
+2. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
 
 For further information, checkout the [Rugpi quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
