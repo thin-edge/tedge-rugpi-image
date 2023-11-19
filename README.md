@@ -19,11 +19,3 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 2. Flash the `build/image.img` image to the Raspberry Pi
 
 For further information, checkout the [Rugpi quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
-
-## Known issues
-
-* The latest Raspberry Pi image does not work for reasons unknown
-
-    ```
-    https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz
-    ```

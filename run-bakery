@@ -3,9 +3,11 @@
 set -euo pipefail
 
 DOCKER=${DOCKER:-docker}
+RUGPI_IMAGE=${RUGPI_IMAGE:-ghcr.io/silitics/rugpi-bakery:latest}
 
 $DOCKER run --rm --privileged \
     -v "$(pwd)":/project \
     -v /dev:/dev \
-    ghcr.io/silitics/rugpi-bakery:latest \
+    --pull always \
+    "$RUGPI_IMAGE" \
     "$@"
