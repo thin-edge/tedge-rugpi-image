@@ -15,6 +15,10 @@ show:
     @echo "CUSTOM_TAR: {{CUSTOM_TAR}}"
     @echo "OUTPUT_IMAGE: {{OUTPUT_IMAGE}}"
 
+# Clean build and cache
+clean:
+    @rm -Rf build/ .rugpi/
+
 # Download and extract the base image
 extract:
     ./run-bakery extract "{{IMAGE_URL}}" "{{BASE_TAR}}"
