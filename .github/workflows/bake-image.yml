@@ -19,7 +19,7 @@ jobs:
           submodules: recursive
 
       - name: Set image name
-        run: echo "IMAGE_NAME=rugpi_tedge_$(date +'%Y-%m-%d-%H%M').img" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=tedge_rugpi_$(date +'%Y-%m-%d-%H%M').img" >> $GITHUB_ENV
 
       - name: Install QEMU
         run: docker run --privileged --rm tonistiigi/binfmt --install arm64
