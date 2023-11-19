@@ -7,7 +7,8 @@ curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel main
 apt-get install -y --no-install-recommends \
     mosquitto-clients \
     c8y-command-plugin \
-    tedge-collectd-setup
+    tedge-collectd-setup \
+    tedge-monit-setup
 
 # custom tedge configuration
 tedge config set apt.name "(tedge|c8y|python|wget|vim|curl|apt|mosquitto|ssh|sudo).*"
