@@ -35,14 +35,14 @@ bake:
     @echo ""
     @echo "Option 1: Use the Raspberry Pi Imager to flash the image to an SD card"
     @echo ""
-    @echo "    {{OUTPUT_IMAGE}}"
+    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}"
     @echo ""
     @echo "Option 2: If the device is already running a rugpi image, open the http://tedge-rugpi:8088 website and install the following image:"
     @echo ""
-    @echo "    {{OUTPUT_IMAGE}}"
+    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}"
     @echo ""
 
-# Download the base image and build the customized image
+# Build the entire image
 build-all: extract customize bake
 
 # Build the image from an already downloaded image
