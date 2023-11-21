@@ -1,11 +1,18 @@
 #!/bin/sh
 set -eu
-LOG_FILE=/data/healthcheck.log
+LOG_FILE=/etc/tedge/healthcheck.log
+
+# Perform simple log rotation, only keep last 200 lines
+if [ -f "$LOG_FILE" ]; then
+    tail -200 "$LOG_FILE" > "${LOG_FILE}.tmp" ||true
+    mv "${LOG_FILE}.tmp" "$LOG_FILE" ||true
+fi
 
 _NEWLINE=$(printf '\n')
 log() {
     message="$(date -Iseconds || date --iso-8601=seconds) $*"
     echo "$message"
+    # Don't stop if writing to log fails (non critical error)
     echo "$message" 2>/dev/null >> "$LOG_FILE" ||true
 }
 
