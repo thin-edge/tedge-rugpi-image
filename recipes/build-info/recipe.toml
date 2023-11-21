@@ -1,0 +1,2 @@
+description = "Add build-info about the image"
+priority = -1  # Execute at the end
