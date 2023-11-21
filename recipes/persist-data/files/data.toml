@@ -1,2 +1,5 @@
 [[persist]]
 directory = "/data"
+
+[[persist]]
+directory = "/var/lib/mosquitto"
