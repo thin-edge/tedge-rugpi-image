@@ -1,0 +1,2 @@
+description = "Create software bill of materials"
+priority = -1  # Execute at the end
