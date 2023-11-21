@@ -67,11 +67,19 @@ collect_rugpi() {
     fi
 
     # Collect firmware information
+    firmware_name=
+    firmware_version=
     if [ -f "$BUILD_INFO" ]; then
-        name=$(cut -d_ -f1-2 "$BUILD_INFO")
-        version=$(cut -d_ -f3- "$BUILD_INFO")
+        firmware_name=$(cut -d_ -f1-2 "$BUILD_INFO")
+        firmware_version=$(cut -d_ -f3- "$BUILD_INFO")
     fi
-    PAYLOAD=$(printf '{"name":"%s","version":"%s"}' "${name:-tedge_rugpi}" "${version:-unknown}")
+    if [ -z "$firmware_name" ]; then
+        firmware_name=tedge_rugpi
+    fi
+    if [ -z "$firmware_version" ]; then
+        firmware_version=unknown
+    fi
+    PAYLOAD=$(printf '{"name":"%s","version":"%s"}' "$firmware_name" "$firmware_version")
     tedge mqtt pub -q 1 -r "$TARGET/twin/c8y_Firmware" "$PAYLOAD" ||:
 
     # Collect rugpi state information, e.g. which partition is active
@@ -79,7 +87,7 @@ collect_rugpi() {
     tedge mqtt pub -q 1 -r "$TARGET/twin/rugpi" "$PAYLOAD" ||:
 
     # publish event for chronological order
-    PAYLOAD=$(printf '{"text":"Partition info. hot=%s, default=%s"}' "$HOT" "$DEFAULT")
+    PAYLOAD=$(printf '{"text":"Partition info. hot=%s (name=%s, version=%s), default=%s"}' "$HOT" "$firmware_name" "$firmware_version" "$DEFAULT")
     tedge mqtt pub -q 1 "$TARGET/e/device_boot" "$PAYLOAD" ||:
 }
 
