@@ -10,7 +10,7 @@ export BUILD_INFO := file_stem(IMAGE_NAME)
 
 # Generate a version name (that can be used in follow up commands)
 generate_version:
-    @echo "tedge_rugpi_$(date +'%Y-%m-%d-%H%M').img"
+    @echo "tedge_rugpi_$(date +'%Y-%m-%d-%H%M')"
 
 # Show the install paths
 show:
