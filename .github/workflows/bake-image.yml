@@ -9,7 +9,7 @@ on:
 env:
   PI_BASE_IMAGE: "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
 
-jobs:  
+jobs:
   bake-image:
     name: Bake Image
     runs-on: ubuntu-latest
@@ -18,21 +18,22 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: extractions/setup-just@v1
+
       - name: Set image name
-        run: echo "IMAGE_NAME=tedge_rugpi_$(date +'%Y-%m-%d-%H%M').img" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(just generate_version)" >> $GITHUB_ENV
 
       - name: Install QEMU
         run: docker run --privileged --rm tonistiigi/binfmt --install arm64
 
       - name: Extract Image
-        run: ./run-bakery extract ${{ env.PI_BASE_IMAGE }} build/base.tar
-      
+        run: just extract
+
       - name: Customize System
-        run: ./run-bakery customize build/base.tar build/customized.tar
-      
+        run: just customize
+
       - name: Bake Image
-        run:
-          ./run-bakery bake build/customized.tar build/${{ env.IMAGE_NAME }}
+        run: just bake
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
