@@ -1,3 +1,4 @@
 /.rugpi
 /build
+recipes/build-info/files/.build_info
 **/debian-packages.list

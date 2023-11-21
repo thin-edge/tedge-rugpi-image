@@ -26,6 +26,7 @@ HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
 DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
 DEVICE_ID="$(tedge config get device.id)"
 TARGET="$(tedge config get mqtt.topic_root)/$(tedge config get mqtt.device_topic_id)"
+BUILD_INFO=/etc/.build_info
 
 log "Current rugpi-ctrl state:"
 /usr/bin/rugpi-ctrl system info | log_r
@@ -64,6 +65,15 @@ collect_rugpi() {
     if [ -z "$DEVICE_ID" ]; then
         return 0
     fi
+
+    # Collect firmware information
+    if [ -f "$BUILD_INFO" ]; then
+        name=$(cut -d_ -f1-2 "$BUILD_INFO")
+        version=$(cut -d_ -f3- "$BUILD_INFO")
+    fi
+    PAYLOAD=$(printf '{"name":"%s","version":"%s"}' "${name:-tedge_rugpi}" "${version:-unknown}")
+    tedge mqtt pub -q 1 -r "$TARGET/twin/c8y_Firmware" "$PAYLOAD" ||:
+
     # Collect rugpi state information, e.g. which partition is active
     PAYLOAD=$(printf '{"hot":"%s","default":"%s"}' "$HOT" "$DEFAULT")
     tedge mqtt pub -q 1 -r "$TARGET/twin/rugpi" "$PAYLOAD" ||:

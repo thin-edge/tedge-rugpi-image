@@ -2,10 +2,15 @@
 export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
-export IMAGE_NAME := replace_regex(file_stem(IMAGE_URL), ".img$", "")
+export IMAGE_NAME := env_var_or_default("IMAGE_NAME", replace_regex(file_stem(IMAGE_URL), ".img$", ""))
 export BASE_TAR := "build" / IMAGE_NAME + ".base.tar"
 export CUSTOM_TAR := "build" / IMAGE_NAME + ".tedge.tar"
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".tedge.img"
+export BUILD_INFO := file_stem(IMAGE_NAME)
+
+# Generate a version name (that can be used in follow up commands)
+generate_version:
+    @echo "tedge_rugpi_$(date +'%Y-%m-%d-%H%M').img"
 
 # Show the install paths
 show:
@@ -14,6 +19,7 @@ show:
     @echo "BASE_TAR: {{BASE_TAR}}"
     @echo "CUSTOM_TAR: {{CUSTOM_TAR}}"
     @echo "OUTPUT_IMAGE: {{OUTPUT_IMAGE}}"
+    @echo "BUILD_INFO: {{BUILD_INFO}}"
 
 # Clean build and cache
 clean:
@@ -25,6 +31,7 @@ extract:
 
 # Apply recipes to the base image
 customize:
+    echo "{{BUILD_INFO}}" > "{{justfile_directory()}}/recipes/build-info/files/.build_info"
     ./run-bakery customize "{{BASE_TAR}}" "{{CUSTOM_TAR}}"
 
 # Create the image that can be flashed to an SD card or applied using the rugpi interface
