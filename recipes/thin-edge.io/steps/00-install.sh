@@ -23,6 +23,9 @@ systemctl enable tedge-mapper-c8y
 systemctl enable tedge-mapper-collectd
 systemctl enable collectd
 
+# Custom mosquitto configuration
+install -D -m 644 "${RECIPE_DIR}/files/custom.conf" -t /etc/tedge/mosquitto-conf/
+
 # TODO: should overlay be persisted by default, otherwise someone can accidentally disable a service
 # and leave it off, however otherwise it is a bit harder to control services during runtime
 #rugpi-ctrl state overlay set-persist true
