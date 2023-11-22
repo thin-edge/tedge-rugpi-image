@@ -91,22 +91,6 @@ collect_rugpi() {
     tedge mqtt pub -q 1 "$TARGET/e/device_boot" "$PAYLOAD" ||:
 }
 
-collect_os_info() {
-    if [ -z "$DEVICE_ID" ]; then
-        return 0
-    fi
-
-    # Collect Operating System information
-    if [ -f /etc/os-release ]; then
-        # shellcheck disable=SC1091
-        . /etc/os-release ||:
-
-        # publish to tedge api which is not yet supported
-        PAYLOAD=$(printf '{"family":"%s","version":"%s"}' "$NAME" "${VERSION:-$VERSION_ID}")
-        tedge mqtt pub --retain "$TARGET/twin/device_OS" "$PAYLOAD" ||:
-    fi
-}
-
 try_wait_for_broker() {
     # Try to wait until the broker is ready before publishing data.
     # Proceed anyway if it still is not ready have N tries
@@ -126,7 +110,6 @@ try_wait_for_broker() {
 publish_system_info() {
     try_wait_for_broker
     collect_rugpi
-    collect_os_info
 }
 
 main() {
