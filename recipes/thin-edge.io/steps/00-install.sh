@@ -8,7 +8,8 @@ apt-get install -y --no-install-recommends \
     mosquitto-clients \
     c8y-command-plugin \
     tedge-collectd-setup \
-    tedge-monit-setup
+    tedge-monit-setup \
+    tedge-inventory-plugin
 
 # custom tedge configuration
 tedge config set apt.name "(tedge|c8y|python|wget|vim|curl|apt|mosquitto|ssh|sudo).*"
