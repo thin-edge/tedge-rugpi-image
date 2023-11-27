@@ -8,6 +8,9 @@ recipes = [
 # So to either pi4 or pi5 if you want to build pi specific images which include the given firmware (EEPROM)
 include_firmware = "none"
 
+# pi3 and zero 2W
+boot_flow = "u-boot"
+
 [parameters.set-hostname]
 hostname = "tedge-rugpi"
 

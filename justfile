@@ -1,5 +1,6 @@
 
-export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
+#export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
+export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-05-03/2023-05-03-raspios-bullseye-arm64-lite.img.xz"
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
 export IMAGE_NAME := env_var_or_default("IMAGE_NAME", replace_regex(file_stem(IMAGE_URL), ".img$", ""))
