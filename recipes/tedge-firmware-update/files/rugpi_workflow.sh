@@ -14,8 +14,13 @@ REBOOT_SPARE_REQUEST=/etc/rugpi/.reboot_spare
 
 SUDO="sudo"
 
-HOT=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
-DEFAULT=$(/usr/bin/rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
+_WORKDIR=$(pwd)
+
+# Change to a directory which is readable otherwise rugpi-ctrl can have problems reading the mounts
+cd /
+
+HOT=$(rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
+DEFAULT=$(rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
 
 ACTION="$1"
 shift
@@ -139,7 +144,7 @@ wait_for_network() {
 }
 
 get_current_partition() {
-    current=$(/usr/bin/rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs | tr '[:lower:]' '[:upper:]')
+    current=$(rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs | tr '[:lower:]' '[:upper:]')
     echo "$current"
 }
 
@@ -209,16 +214,25 @@ install() {
     case "$url" in
         http*.xz)
             log "Executing: wget -c -q -t 0 -O - '$url' | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-            wget -c -q -t 0 -O - "$url" | xz -d | rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            wget -c -q -t 0 -O - "$url" | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
             ;;
         http*.img)
-            log "Executing: wget -c -q -t 0 -O - '$url' | rugpi-ctrl update install --stream --no-reboot -"
-            wget -c -q -t 0 -O - "$url" | rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            log "Executing: wget -c -q -t 0 -O - '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
+            wget -c -q -t 0 -O - "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
             ;;
         # It is a file
-        *)
+        *.xz)
+            # Decode the file and stream it into rugpi (decompressing on the fly)
+            log "TODO: Executing: xz -d -T0 -c '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
+            xz --decompress --stdout -T0 "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            ;;
+        *.img)
+            # Uncompressed file
             log "Executing: rugpi-ctrl update install --no-reboot '$url'"
-            rugpi-ctrl update install --no-reboot "$url" >>"$LOG_FILE" 2>&1
+            $SUDO rugpi-ctrl update install --no-reboot "$url" >>"$LOG_FILE" 2>&1
+            ;;
+        *)
+            log "Unsupported firmware file format. file=$url. Only xz and img files are supported"
             ;;
     esac
     EXIT_CODE=$?
@@ -277,7 +291,7 @@ verify() {
 commit() {
     log "Executing: rugpi-ctrl system commit"
     set +e
-    $SUDO /usr/bin/rugpi-ctrl system commit >> "$LOG_FILE" 2>&1
+    $SUDO rugpi-ctrl system commit >> "$LOG_FILE" 2>&1
     EXIT_CODE=$?
     set -e
 
@@ -326,5 +340,8 @@ case "$ACTION" in
         exit 1
         ;;
 esac
+
+# switch back to original directory
+cd "$_WORKDIR" ||:
 
 exit 0
