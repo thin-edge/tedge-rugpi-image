@@ -8,9 +8,13 @@ export CUSTOM_TAR := "build" / IMAGE_NAME + ".tedge.tar"
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".tedge.img"
 export BUILD_INFO := file_stem(IMAGE_NAME)
 
+set-image FILE="images/pi45.toml":
+    rm -f ./rugpi-bakery.toml
+    ln -s {{FILE}} ./rugpi-bakery.toml
+
 # Generate a version name (that can be used in follow up commands)
-generate_version:
-    @echo "tedge_rugpi_$(date +'%Y-%m-%d-%H%M')"
+generate_version prefix="tedge_rugpi":
+    @echo "{{prefix}}_$(date +'%Y-%m-%d-%H%M')"
 
 # Show the install paths
 show:

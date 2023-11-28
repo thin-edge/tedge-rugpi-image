@@ -21,10 +21,13 @@ jobs:
       - uses: extractions/setup-just@v1
 
       - name: Set image name
-        run: echo "IMAGE_NAME=$(just generate_version)" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(just generate_version tedge_rugpi_45)" >> $GITHUB_ENV
 
       - name: Install QEMU
         run: docker run --privileged --rm tonistiigi/binfmt --install arm64
+
+      - name: Set Image
+        run: just set-image images/pi45.toml
 
       - name: Extract Image
         run: just extract

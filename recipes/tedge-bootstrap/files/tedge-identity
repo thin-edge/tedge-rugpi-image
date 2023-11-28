@@ -22,7 +22,7 @@ get_mac_address() {
 
         # Skip dummy interfaces
         if echo "$dev" | grep -q "$SCN/dummy" 2>/dev/null; then
-        continue
+            continue
         fi
 
         idx=$(cat "$dev/ifindex")
@@ -61,7 +61,7 @@ get_model_type() {
         Raspberry\ Pi\ 3*)
             MODEL_PREFIX=rpi3
             ;;
-        Raspberry\ Pi\ 2\ Rev*)
+        Raspberry\ Pi\ 2*)
             MODEL_PREFIX=rpi2
             ;;
         Raspberry\ Pi\ Model*)

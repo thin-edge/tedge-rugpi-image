@@ -12,4 +12,4 @@ DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
 
 # Remove sid afterwards to prevent unexpected packages from being installed
 rm -f /etc/apt/sources.list.d/debian-sid.list
-apt-get update
+apt-get update ||:

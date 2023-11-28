@@ -4,6 +4,10 @@ set -e
 C8Y_URL=
 RAN_MARKER=/etc/tedge/.bootstrapped
 
+log() {
+    echo "$@" >&2
+}
+
 create_cert() {
     name="$1"
     if tedge cert show >/dev/null 2>&1; then
@@ -73,7 +77,19 @@ if [ $# -gt 0 ]; then
 fi
 
 # set hostname
-DEVICE_ID="$(tedge-identity)"
+DEVICE_ID=
+attempt=0
+while [ "$attempt" -lt 30 ]; do
+    DEVICE_ID="$(tedge-identity ||:)"
+    if [ -n "$DEVICE_ID" ]; then
+        log "Found valid DEVICE_ID"
+        break
+    fi
+    attempt=$((attempt + 1))
+    log "Waiting for tedge-identity"
+    sleep 5
+done
+
 set_hostname "$DEVICE_ID"
 create_cert "$DEVICE_ID"
 

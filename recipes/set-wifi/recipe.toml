@@ -1,0 +1,6 @@
+description = "Set wifi access"
+default = false
+
+[parameters]
+ssid = {}
+password = {}
