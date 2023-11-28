@@ -1,6 +1,5 @@
 
-#export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
-export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-05-03/2023-05-03-raspios-bullseye-arm64-lite.img.xz"
+export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
 export IMAGE_NAME := env_var_or_default("IMAGE_NAME", replace_regex(file_stem(IMAGE_URL), ".img$", ""))
@@ -9,9 +8,13 @@ export CUSTOM_TAR := "build" / IMAGE_NAME + ".tedge.tar"
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".tedge.img"
 export BUILD_INFO := file_stem(IMAGE_NAME)
 
+set-image FILE="images/pi45.toml":
+    rm -f ./rugpi-bakery.toml
+    ln -s {{FILE}} ./rugpi-bakery.toml
+
 # Generate a version name (that can be used in follow up commands)
-generate_version:
-    @echo "tedge_rugpi_$(date +'%Y-%m-%d-%H%M')"
+generate_version prefix="tedge_rugpi":
+    @echo "{{prefix}}_$(date +'%Y-%m-%d-%H%M')"
 
 # Show the install paths
 show:
