@@ -4,7 +4,7 @@
 curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel main
 
 # Install collectd
-apt-get install -y --no-install-recommends \
+apt-get install -y -o DPkg::Options::=--force-confnew --no-install-recommends \
     mosquitto-clients \
     c8y-command-plugin \
     tedge-collectd-setup \
