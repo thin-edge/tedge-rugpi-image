@@ -3,6 +3,8 @@ recipes = [
     "persist-root-home",
     "ssh",
     "zsh",
+    "persist-overlay",
+    "tedge-firmware-update",
 ]
 
 # Make image generic so it can be used for pi4 and pi5

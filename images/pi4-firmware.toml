@@ -3,6 +3,8 @@ recipes = [
     "persist-root-home",
     "ssh",
     "zsh",
+    "persist-overlay",
+    "tedge-firmware-update",
 ]
 
 # Include firmware as some older pi4 need a firmware update before tryboot will work
