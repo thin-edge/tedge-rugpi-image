@@ -1,0 +1,2 @@
+[system]
+reboot = ["/usr/bin/rugpi_workflow.sh", "restart"]

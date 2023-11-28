@@ -8,4 +8,6 @@ install -D -m 755 "${RECIPE_DIR}/files/health.d/"* -t /etc/health.d/
 install -D -m 755 "${RECIPE_DIR}/files/healthcheck.sh" -t /usr/bin/
 install -D -m 644 "${RECIPE_DIR}/files/rugpi-auto-rollback.service" -t /usr/lib/systemd/system/
 
-systemctl enable rugpi-auto-rollback
+if [ "${RECIPE_PARAM_ENABLED}" = "true" ]; then
+    systemctl enable rugpi-auto-rollback
+fi
