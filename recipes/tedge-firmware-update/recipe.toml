@@ -1,4 +1,4 @@
 description = "Add workflow scripts to support firmware updates"
 default = false
-priority = 900_000
+priority = 10_000
 dependencies = ["thin-edge.io"]
