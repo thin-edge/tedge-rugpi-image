@@ -1,18 +1,10 @@
 recipes = [
-    # "set-hostname",
     "persist-root-home",
     "ssh",
     "zsh",
+    "persist-overlay",
+    "tedge-firmware-update",
 ]
-
-# Make image generic so it can be used for pi4 and pi5
-# So to either pi4 or pi5 if you want to build pi specific images which include the given firmware (EEPROM)
-include_firmware = "none"
-
-boot_flow = "u-boot"
-
-[parameters.set-hostname]
-hostname = "tedge-rugpi"
 
 [parameters.apt-cleanup]
 autoremove = true

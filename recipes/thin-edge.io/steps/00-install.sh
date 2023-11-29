@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # install thin-edge.io
-curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel main
+curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel dev | tee -a "${RECIPE_DIR}/build.log"
 
 # Install collectd
 apt-get install -y -o DPkg::Options::=--force-confnew --no-install-recommends \
@@ -9,7 +9,7 @@ apt-get install -y -o DPkg::Options::=--force-confnew --no-install-recommends \
     c8y-command-plugin \
     tedge-collectd-setup \
     tedge-monit-setup \
-    tedge-inventory-plugin
+    tedge-inventory-plugin | tee -a "${RECIPE_DIR}/build.log"
 
 # custom tedge configuration
 tedge config set apt.name "(tedge|c8y|python|wget|vim|curl|apt|mosquitto|ssh|sudo).*"
@@ -27,6 +27,5 @@ systemctl enable collectd
 # Custom mosquitto configuration
 install -D -m 644 "${RECIPE_DIR}/files/custom.conf" -t /etc/tedge/mosquitto-conf/
 
-# TODO: should overlay be persisted by default, otherwise someone can accidentally disable a service
-# and leave it off, however otherwise it is a bit harder to control services during runtime
-#rugpi-ctrl state overlay set-persist true
+# Persist tedge configuration and related components (e.g. mosquitto)
+install -D -m 644 "${RECIPE_DIR}/files/tedge-config.toml" -t /etc/rugpi/state

@@ -1,0 +1,5 @@
+[[persist]]
+directory = "/etc/tedge"
+
+[[persist]]
+directory = "/etc/mosquitto"

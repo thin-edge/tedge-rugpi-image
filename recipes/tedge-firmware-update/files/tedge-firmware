@@ -1,0 +1,1 @@
+tedge  ALL = (ALL) NOPASSWD: /usr/bin/rugpi-ctrl, /usr/bin/rugpi_workflow.sh
