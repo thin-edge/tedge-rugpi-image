@@ -2,4 +2,7 @@
 directory = "/etc/tedge"
 
 [[persist]]
+directory = "/var/log/tedge"
+
+[[persist]]
 directory = "/etc/mosquitto"

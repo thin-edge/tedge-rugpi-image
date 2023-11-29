@@ -6,9 +6,7 @@ ON_RESTART="restart"
 FIRMWARE_NAME=
 FIRMWARE_VERSION=
 FIRMWARE_URL=
-CMD_ID=x
 FIRMWARE_META_FILE=/etc/tedge/.firmware
-LOG_FILE=/etc/tedge/firmware_update.log
 MANUAL_DOWNLOAD=0
 
 # Use temp directory so that the file can't accidentally persist across partitions
@@ -20,7 +18,7 @@ SUDO="sudo"
 _WORKDIR=$(pwd)
 
 # Change to a directory which is readable otherwise rugpi-ctrl can have problems reading the mounts
-cd /
+cd /tmp || cd /
 
 HOT=$(rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
 DEFAULT=$(rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
@@ -30,27 +28,26 @@ shift
 
 
 log() {
-    msg="$(date +%Y-%m-%dT%H:%M:%S) [cmd=$CMD_ID, current=$ACTION] $*"
+    msg="$(date +%Y-%m-%dT%H:%M:%S) [current=$ACTION] $*"
     echo "$msg" >&2
 
     # publish to pub for better resolution
     current_partition=$(get_current_partition)
-    tedge mqtt pub -q 2 te/device/main///e/firmware_update "{\"text\":\"Firmware Workflow: [$ACTION] $*\",\"command_id\":\"$CMD_ID\",\"state\":\"$ACTION\",\"partition\":\"$current_partition\"}"
+    tedge mqtt pub -q 2 te/device/main///e/firmware_update "{\"text\":\"Firmware Workflow: [$ACTION] $*\",\"state\":\"$ACTION\",\"partition\":\"$current_partition\"}"
     sleep 1
-
-    if [ -n "$LOG_FILE" ]; then
-        echo "$msg" >> "$LOG_FILE"
-    fi
 }
 
 local_log() {
     # Only log locally and don't push to the cloud
-    msg="$(date +%Y-%m-%dT%H:%M:%S) [cmd=$CMD_ID, current=$ACTION] $*"
+    msg="$(date +%Y-%m-%dT%H:%M:%S) [current=$ACTION] $*"
     echo "$msg" >&2
+}
 
-    if [ -n "$LOG_FILE" ]; then
-        echo "$msg" >> "$LOG_FILE"
-    fi
+next_state_with_context() {
+    echo ":::begin-tedge:::"
+    echo "$1"
+    echo ":::end-tedge:::"
+    sleep 1
 }
 
 next_state() {
@@ -61,13 +58,16 @@ next_state() {
         reason="$2"
     fi
 
+    message=
     if [ -n "$reason" ]; then
         log "Moving to next State: $status. reason=$reason"
-        printf '{"status":"%s","reason":"%s"}\n' "$status" "$reason"
+        message=$(printf '{"status":"%s","reason":"%s"}' "$status" "$reason")
     else
         log "Moving to next State: $status"
-        printf '{"status":"%s"}\n' "$status"
+        message=$(printf '{"status":"%s"}' "$status")
     fi
+
+    next_state_with_context "$message"
     sleep 1
 }
 
@@ -76,16 +76,16 @@ next_state() {
 #
 while [ $# -gt 0 ]; do
     case "$1" in
-        --id)
-            CMD_ID="$2"
-            shift
-            ;;
         --firmware-name)
             FIRMWARE_NAME="$2"
             shift
             ;;
         --firmware-version)
             FIRMWARE_VERSION="$2"
+            shift
+            ;;
+        --url)
+            FIRMWARE_URL="$2"
             shift
             ;;
         --on-success)
@@ -98,10 +98,6 @@ while [ $# -gt 0 ]; do
             ;;
         --on-restart)
             ON_RESTART="$2"
-            shift
-            ;;
-        --url)
-            FIRMWARE_URL="$2"
             shift
             ;;
     esac
@@ -158,11 +154,9 @@ get_next_partition() {
 executing() {
     current_partition=$(get_current_partition)
     next_partition=$(get_next_partition "$current_partition")
-    {
-        echo "---------------------------------------------------------------------------"
-        echo "Firmware update (id=$CMD_ID): $current_partition -> $next_partition"
-        echo "---------------------------------------------------------------------------"
-    } >> "$LOG_FILE"
+    echo "---------------------------------------------------------------------------"
+    echo "Firmware update: $current_partition -> $next_partition"
+    echo "---------------------------------------------------------------------------"
     log "Starting firmware update. Current partition is $(get_current_partition), so update will be applied to $next_partition"
 }
 
@@ -190,7 +184,7 @@ download() {
             ;;
         *)
             # Assume url is actually a file and just go to the next state
-            printf '{"status":"%s","url":"%s"}\n' "$status" "$url"
+            next_state_with_context "$(printf '{"status":"%s","url":"%s"}\n' "$status" "$url")"
             return 0
             ;;
     esac
@@ -208,10 +202,10 @@ download() {
         log "Manually downloading artifact from $tedge_url and saving to $local_file"
         wget -c -O "$local_file" "$tedge_url" >&2
         log "Downloaded file from: $tedge_url"
-        printf '{"status":"%s","url":"%s"}\n' "$status" "$local_file"
+        next_state_with_context "$(printf '{"status":"%s","url":"%s"}\n' "$status" "$local_file")"
     else
         log "Converted to local url: $url => $tedge_url"
-        printf '{"status":"%s","url":"%s"}\n' "$status" "$tedge_url"
+        next_state_with_context "$(printf '{"status":"%s","url":"%s"}\n' "$status" "$tedge_url")"
     fi
 }
 
@@ -221,13 +215,13 @@ install() {
     case "$url" in
         http://*.img|https://*.img)
             log "Executing: wget -c -q -t 0 -O - '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-            wget -c -q -t 0 -O - "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            wget -c -q -t 0 -O - "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot -
             ;;
 
         # Assume a xz compressed file        
         http://*|https://*)
             log "Executing: wget -c -q -t 0 -O - '$url' | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-            wget -c -q -t 0 -O - "$url" | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            wget -c -q -t 0 -O - "$url" | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot -
             ;;
 
         # It is a file
@@ -239,12 +233,12 @@ install() {
                 application/x-xz)
                     # Decode the file and stream it into rugpi (decompressing on the fly)
                     log "Executing: xz -d -T0 -c '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-                    xz --decompress --stdout -T0 "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+                    xz --decompress --stdout -T0 "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot -
                     ;;
                 *)
                     # Uncompressed file
                     log "Executing: rugpi-ctrl update install --no-reboot '$url'"
-                    $SUDO rugpi-ctrl update install --no-reboot "$url" >>"$LOG_FILE" 2>&1
+                    $SUDO rugpi-ctrl update install --no-reboot "$url"
                     ;;
             esac
             ;;
@@ -298,7 +292,7 @@ verify() {
     fi
 
     # Allow users to also call addition logic by adding their scripts to the /etc/health.d/ directory
-    if /usr/bin/healthcheck.sh >> "$LOG_FILE" 2>&1; then
+    if /usr/bin/healthcheck.sh; then
         next_state "$ON_SUCCESS"
     else
         log "Health check failed on new partition"
@@ -309,7 +303,7 @@ verify() {
 commit() {
     log "Executing: rugpi-ctrl system commit"
     set +e
-    $SUDO rugpi-ctrl system commit >> "$LOG_FILE" 2>&1
+    $SUDO rugpi-ctrl system commit
     EXIT_CODE=$?
     set -e
 
