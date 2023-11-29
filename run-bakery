@@ -11,22 +11,3 @@ $DOCKER run --rm --privileged \
     --pull always \
     "$RUGPI_IMAGE" \
     "$@"
-
-if [ -n "$CI" ]; then
-    # Fix ownership issues on CI runner as the docker output produces files
-    # not owned by the calling user. This causes downstream issues with tools
-    # such as xz which tries to change the group ownership of the compressed
-    # file.
-    ls -la build/
-    echo "Checking lsattr"
-    sudo lsattr build/* ||:
-    echo "Checking build folder ownership: user=$(whoami)"
-    sudo chown "$(whoami):$(whoami)" -R . ||:
-    sudo chmod 755 build ||:
-    sudo chmod 777 build/* ||:
-    # sudo chattr -i build/*.* ||:
-    echo "After fix"
-    ls -la build/
-    echo "Checking lsattr"
-    sudo lsattr build/* ||:
-fi
