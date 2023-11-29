@@ -9,7 +9,7 @@ FIRMWARE_URL=
 CMD_ID=x
 FIRMWARE_META_FILE=/etc/tedge/.firmware
 LOG_FILE=/etc/tedge/firmware_update.log
-MANUAL_DOWNLOAD=1
+MANUAL_DOWNLOAD=0
 
 # Use temp directory so that the file can't accidentally persist across partitions
 # thus always booting into the spare partition
