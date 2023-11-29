@@ -10,7 +10,10 @@ CMD_ID=x
 FIRMWARE_META_FILE=/etc/tedge/.firmware
 LOG_FILE=/etc/tedge/firmware_update.log
 MANUAL_DOWNLOAD=1
-REBOOT_SPARE_REQUEST=/etc/rugpi/.reboot_spare
+
+# Use temp directory so that the file can't accidentally persist across partitions
+# thus always booting into the spare partition
+REBOOT_SPARE_REQUEST=/tmp/.reboot_spare
 
 SUDO="sudo"
 
@@ -221,18 +224,22 @@ install() {
             wget -c -q -t 0 -O - "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
             ;;
         # It is a file
-        *.xz)
-            # Decode the file and stream it into rugpi (decompressing on the fly)
-            log "TODO: Executing: xz -d -T0 -c '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-            xz --decompress --stdout -T0 "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
-            ;;
-        *.img)
-            # Uncompressed file
-            log "Executing: rugpi-ctrl update install --no-reboot '$url'"
-            $SUDO rugpi-ctrl update install --no-reboot "$url" >>"$LOG_FILE" 2>&1
-            ;;
         *)
-            log "Unsupported firmware file format. file=$url. Only xz and img files are supported"
+            # Check file type using mime types
+            mime_type=$(file "$url" --mime-type | cut -d: -f2 | xargs)
+
+            case "$mime_type" in
+                application/x-xz)
+                    # Decode the file and stream it into rugpi (decompressing on the fly)
+                    log "Executing: xz -d -T0 -c '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
+                    xz --decompress --stdout -T0 "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+                    ;;
+                *)
+                    # Uncompressed file
+                    log "Executing: rugpi-ctrl update install --no-reboot '$url'"
+                    $SUDO rugpi-ctrl update install --no-reboot "$url" >>"$LOG_FILE" 2>&1
+                    ;;
+            esac
             ;;
     esac
     EXIT_CODE=$?
@@ -241,7 +248,7 @@ install() {
     case "$EXIT_CODE" in
         0)
             log "OK, RESTART required"
-            next_state "$ON_SUCCESS"
+            next_state "$ON_RESTART"
             ;;
         *)
             log "ERROR. Unexpected return code. code=$EXIT_CODE"
@@ -255,15 +262,18 @@ install() {
 
 restart() {
     # NOTE: This function should not be called in the script directly but rather via the system.toml
+    current_partition=$(get_current_partition)
+    next_partition=$(get_next_partition "$current_partition")
+
     if [ -f "$REBOOT_SPARE_REQUEST" ]; then
         rm -f "$REBOOT_SPARE_REQUEST"
 
-        message=$(printf '{"text":"Rebooting into spare partition (%s -> %s)"}' "$(get_current_partition)" "$(get_next_partition)")
+        message=$(printf '{"text":"Rebooting into spare partition (%s -> %s)","partition":"%s"}' "$current_partition" "$next_partition" "$current_partition")
         tedge mqtt pub -q 1 "te/device/main///e/reboot_spare" "$message" ||:
         sleep 5
         $SUDO rugpi-ctrl system reboot --spare
     else
-        message=$(printf '{"text":"Rebooting into default partition (%s -> %s)"}' "$(get_current_partition)" "$DEFAULT")
+        message=$(printf '{"text":"Rebooting into default partition (%s -> %s)","partition":"%s"}' "$current_partition" "$DEFAULT" "$current_partition")
         tedge mqtt pub -q 1 "te/device/main///e/reboot_default" "$message" ||:
         sleep 5
         $SUDO rugpi-ctrl system reboot
@@ -281,9 +291,10 @@ verify() {
     fi
 
     # Allow users to also call addition logic by adding their scripts to the /etc/health.d/ directory
-    if /usr/bin/healthcheck.sh; then
+    if /usr/bin/healthcheck.sh >> "$LOG_FILE" 2>&1; then
         next_state "$ON_SUCCESS"
     else
+        log "Health check failed on new partition"
         next_state "$ON_RESTART"
     fi
 }

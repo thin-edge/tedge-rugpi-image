@@ -15,7 +15,7 @@ script = "/usr/bin/rugpi_workflow.sh download --id ${.topic.cmd_id} --url ${.pay
 next = ["install"]
 
 [install]
-script = "/usr/bin/rugpi_workflow.sh install --id ${.topic.cmd_id} --url ${.payload.url} --on-success commit --on-restart restart --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh install --id ${.topic.cmd_id} --url ${.payload.url} --on-success restart --on-restart restart --on-error failed"
 next = ["commit", "restart", "failed"]
 
 [restart]
