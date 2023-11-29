@@ -7,15 +7,15 @@ next = ["scheduled"]
 next = ["executing"]
 
 [executing]
-script = "/usr/bin/rugpi_workflow.sh executing --id ${.topic.cmd_id} --on-success download"
+script = "/usr/bin/rugpi_workflow.sh executing --on-success download"
 next = ["download"]
 
 [download]
-script = "/usr/bin/rugpi_workflow.sh download --id ${.topic.cmd_id} --url ${.payload.remoteUrl} --on-success install --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh download --url ${.payload.remoteUrl} --on-success install --on-error failed"
 next = ["install"]
 
 [install]
-script = "/usr/bin/rugpi_workflow.sh install --id ${.topic.cmd_id} --url ${.payload.url} --on-success restart --on-restart restart --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh install --url ${.payload.url} --on-success restart --on-restart restart --on-error failed"
 next = ["commit", "restart", "failed"]
 
 [restart]
@@ -23,19 +23,19 @@ script = "restart"
 next = ["restarting", "restarted", "failed_restart"]
 
 [restarted]
-script = "/usr/bin/rugpi_workflow.sh restarted --id ${.topic.cmd_id} --on-success verify"
+script = "/usr/bin/rugpi_workflow.sh restarted --on-success verify"
 next = ["verify"]
 
 [failed_restart]
-script = "/usr/bin/rugpi_workflow.sh failed_restart --id ${.topic.cmd_id} --on-success failed --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh failed_restart --on-success failed --on-error failed"
 next = ["failed"]
 
 [verify]
-script = "/usr/bin/rugpi_workflow.sh verify --id ${.topic.cmd_id} --firmware-name ${.payload.name} --firmware-version ${.payload.version} --url ${.payload.remoteUrl} --on-success commit --on-restart rollback_restart --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh verify --firmware-name ${.payload.name} --firmware-version ${.payload.version} --url ${.payload.remoteUrl} --on-success commit --on-restart rollback_restart --on-error failed"
 next = ["commit", "rollback_restart", "failed"]
 
 [commit]
-script = "/usr/bin/rugpi_workflow.sh commit --id ${.topic.cmd_id} --firmware-name ${.payload.name} --firmware-version ${.payload.version} --url ${.payload.remoteUrl} --on-success successful --on-restart rollback_restart --on-error failed"
+script = "/usr/bin/rugpi_workflow.sh commit --firmware-name ${.payload.name} --firmware-version ${.payload.version} --url ${.payload.remoteUrl} --on-success successful --on-restart rollback_restart --on-error failed"
 next = ["successful", "rollback_restart"]
 
 [rollback_restart]
@@ -43,7 +43,7 @@ script = "restart"
 next = ["restarting", "rollback_successful", "failed"]
 
 [rollback_successful]
-script = "/usr/bin/rugpi_workflow.sh rollback_successful --id ${.topic.cmd_id} --on-success failed"
+script = "/usr/bin/rugpi_workflow.sh rollback_successful --on-success failed"
 next = ["failed"]
 
 [successful]
