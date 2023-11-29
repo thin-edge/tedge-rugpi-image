@@ -2,10 +2,14 @@
 export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
-export IMAGE_NAME := env_var_or_default("IMAGE_NAME", replace_regex(file_stem(IMAGE_URL), ".img$", ""))
-export BASE_TAR := "build" / IMAGE_NAME + ".base.tar"
-export CUSTOM_TAR := "build" / IMAGE_NAME + ".tedge.tar"
-export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".tedge.img"
+export PREFIX := "tedge_rugpi_"
+export BASE_IMAGE := replace_regex(file_stem(IMAGE_URL), ".img$", "")
+export BASE_TAR := "build" / BASE_IMAGE + ".base.tar"
+export CUSTOM_TAR := "build" / BASE_IMAGE + ".tedge.tar"
+
+export VARIANT := ""
+export IMAGE_NAME := env_var_or_default("IMAGE_NAME", PREFIX + `date +'%Y%m%d%H%M'`)
+export OUTPUT_IMAGE := "build" / IMAGE_NAME + replace("." + VARIANT + ".img", "..", ".")
 export BUILD_INFO := file_stem(IMAGE_NAME)
 
 set-image FILE="images/pi45.toml":
@@ -13,8 +17,8 @@ set-image FILE="images/pi45.toml":
     ln -s {{FILE}} ./rugpi-bakery.toml
 
 # Generate a version name (that can be used in follow up commands)
-generate_version prefix="tedge_rugpi":
-    @echo "{{prefix}}_$(date +'%Y-%m-%d-%H%M')"
+generate_version:
+    @echo "{{IMAGE_NAME}}"
 
 # Show the install paths
 show:
@@ -25,9 +29,9 @@ show:
     @echo "OUTPUT_IMAGE: {{OUTPUT_IMAGE}}"
     @echo "BUILD_INFO: {{BUILD_INFO}}"
 
-# Clean build and cache
+# Clean build
 clean:
-    @rm -Rf build/ .rugpi/
+    @rm -Rf build/
 
 # Download and extract the base image
 extract:
@@ -42,15 +46,19 @@ customize:
 bake:
     ./run-bakery bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
     @echo ""
+    @echo "Compressing image"
+    xz -0 -v "{{OUTPUT_IMAGE}}"
+    @echo ""
+    @echo ""
     @echo "Image created successfully. Check below for options on how to use the image"
     @echo ""
     @echo "Option 1: Use the Raspberry Pi Imager to flash the image to an SD card"
     @echo ""
-    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}"
+    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}.xz"
     @echo ""
     @echo "Option 2: If the device is already running a rugpi image, open the http://tedge-rugpi:8088 website and install the following image:"
     @echo ""
-    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}"
+    @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}.xz"
     @echo ""
 
 # Build the entire image
