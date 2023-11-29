@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # install thin-edge.io
-curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel dev
+curl -fsSL https://thin-edge.io/install.sh | sh -s -- --channel dev | tee -a "${RECIPE_DIR}/build.log"
 
 # Install collectd
 apt-get install -y -o DPkg::Options::=--force-confnew --no-install-recommends \
