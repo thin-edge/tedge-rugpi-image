@@ -17,5 +17,9 @@ if [ -n "$CI" ]; then
     # not owned by the calling user. This causes downstream issues with tools
     # such as xz which tries to change the group ownership of the compressed
     # file.
-    sudo chown "$(whoami):$(whoami)" -R build ||:
+    ls -la build/
+    echo "Checking build folder ownership: user=$(whoami)"
+    sudo chown "$(whoami)" -R build ||:
+    echo "After chown"
+    ls -la build/
 fi
