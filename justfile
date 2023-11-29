@@ -51,9 +51,10 @@ customize:
 # Create the image that can be flashed to an SD card or applied using the rugpi interface
 bake:
     ./run-bakery --config "{{IMAGE_CONFIG}}" bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
+    [ -n "$CI" ] && sudo chmod 777 build/*
     @echo ""
     @echo "Compressing image"
-    xz --keep -0 -v "{{OUTPUT_IMAGE}}"
+    xz -0 -v "{{OUTPUT_IMAGE}}"
     @echo ""
     @echo ""
     @echo "Image created successfully. Check below for options on how to use the image"
