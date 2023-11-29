@@ -219,14 +219,17 @@ install() {
     url="$1"
     set +e
     case "$url" in
-        http*.xz)
-            log "Executing: wget -c -q -t 0 -O - '$url' | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot -"
-            wget -c -q -t 0 -O - "$url" | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
-            ;;
-        http*.img)
+        http://*.img|https://*.img)
             log "Executing: wget -c -q -t 0 -O - '$url' | $SUDO rugpi-ctrl update install --stream --no-reboot -"
             wget -c -q -t 0 -O - "$url" | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
             ;;
+
+        # Assume a xz compressed file        
+        http://*|https://*)
+            log "Executing: wget -c -q -t 0 -O - '$url' | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot -"
+            wget -c -q -t 0 -O - "$url" | xz -d | $SUDO rugpi-ctrl update install --stream --no-reboot - >>"$LOG_FILE" 2>&1
+            ;;
+
         # It is a file
         *)
             # Check file type using mime types
