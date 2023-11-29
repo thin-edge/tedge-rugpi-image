@@ -174,19 +174,23 @@ download() {
     # Change url to a local url using the c8y proxy
     #
     case "$url" in
-        http://*)
-            partial_path=$(echo "$url" | sed 's|https://[^/]*/||g')
-            tedge_url="$url"
-            ;;
-        https://*)
+        https://*/inventory/binaries/*)
+            # Cumulocity URL, use the c8y auth proxy service
             partial_path=$(echo "$url" | sed 's|https://[^/]*/||g')
             c8y_proxy_host=$(tedge config get c8y.proxy.client.host)
             c8y_proxy_port=$(tedge config get c8y.proxy.client.port)
             tedge_url="http://${c8y_proxy_host}:${c8y_proxy_port}/c8y/$partial_path"
             ;;
+        http://*|https://*)
+            # External URL, pass it untouched
+            # NOTE: If a service required authorization, then this would be the place to add it
+            # For example some blob stores support signed URLS
+            partial_path=$(echo "$url" | sed 's|https://[^/]*/||g')
+            tedge_url="$url"
+            ;;
         *)
             # Assume url is actually a file and just go to the next state
-            printf '{"status":"%s"}\n' "$status"
+            printf '{"status":"%s","url":"%s"}\n' "$status" "$url"
             return 0
             ;;
     esac
