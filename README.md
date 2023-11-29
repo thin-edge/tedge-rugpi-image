@@ -1,16 +1,51 @@
 # thin-edge.io image using rugpi
 
-The repository can be used to build custom Raspberry Pi images with thin-edge.io and rugpi (for firmware updates) pre-installed.
+The repository can be used to build custom Raspberry Pi images with thin-edge.io and Rugpi for robust OTA Operation System updates.
 
-**Compatible devices**
+## Compatible devices
 
-* Raspberry PI 2B Rev 1.2 (using u-boot)
-* Raspberry PI Zero 2 W (using u-boot)
-* Raspberry PI 3 (using u-boot)
+**Using u-boot bootloader**
+
+* Raspberry PI 2B Rev 1.2
+* Raspberry PI Zero 2 W
+* Raspberry PI 3
+
+**Using tryboot bootloader**
+
 * Raspberry Pi 4 (using tryboot)
 * Raspberry Pi 5 (using tryboot)
 
-## Building an image
+
+## Images
+
+The following images are included in this repository.
+
+A profile determines what software and configuration is included in the image.
+
+A variant is more hardware specific which uses the same profile but makes hardware specific tweaks based on the hardware limitations. For example Raspberry 2, 3 and Zero 2 W do not support the tryboot feature, so instead the u-boot bootloader is used to facilitate the robust OTA image updates.
+
+The following sections describe the profiles and variants available.
+
+### Profiles
+
+|Profile|Description|
+|-------|-----------|
+|default|Default image which does not include WiFi credentials|
+|wifi|All the contents of the default image but also has WiFi credentials included in the image. Suitable for devices without an ethernet adapter|
+
+
+### Variants
+
+|Variant|Supported Raspberry Pi Versions|Description|
+|-------|-------------------------------|-----------|
+|pi45|4 and 5|Does not include firmware so rpi4 needs to have up to date firmware for this image to work!|
+|pi4|4|Includes firmware which enables the tryboot mechanism|
+|pi023|2, 3 and Zero 2 W|Uses u-boot|
+
+
+## Building
+
+### Building an image without WIFI credentials (devices must have an ethernet adapter!)
 
 To run the build tasks, install [just](https://just.systems/man/en/chapter_5.html).
 
@@ -20,22 +55,13 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     just VARIANT=pi45 build-all
     ```
 
-    Possible variants are:
-
-    * pi45
-    * pi4
-    * pi023
-
-    ```sh
-    just PROFILE=wifi VARIANT=pi4 build-all
-    ```
-
 2. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
 
+3. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
 
-For further information, checkout the [Rugpi quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
+For further information on Rugpi, checkout the [quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
 
-## Building an image with WIFI credentials
+### Building an image with WIFI credentials
 
 For devices that only support WIFI (e.g. don't have an ethernet adapter), the WIFI credentials are required to be part of the image, otherwise you don't have any way to connect via SSH to your device.
 
