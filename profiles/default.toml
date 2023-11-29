@@ -1,19 +1,10 @@
 recipes = [
-    # "set-hostname",
     "persist-root-home",
     "ssh",
     "zsh",
     "persist-overlay",
     "tedge-firmware-update",
 ]
-
-# Include firmware as some older pi4 need a firmware update before tryboot will work
-include_firmware = "pi4"
-
-boot_flow = "tryboot"
-
-[parameters.set-hostname]
-hostname = "tedge-rugpi"
 
 [parameters.apt-cleanup]
 autoremove = true

@@ -23,14 +23,14 @@ jobs:
       - name: Install QEMU
         run: docker run --privileged --rm tonistiigi/binfmt --install arm64
 
-      - name: Set Image
-        run: just set-image images/pi45.toml
+      - name: Set image version
+        run: echo "VERSION=$(just generate_version)" >> $GITHUB_ENV
 
       - name: Build image
-        run: just build-all
+        run: just build-all-variants
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
-          name: image
+          name: images
           path: build/*.xz

@@ -3,30 +3,36 @@ export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
 export PREFIX := "tedge_rugpi_"
+export PROFILE := "default"
+
 export BASE_IMAGE := replace_regex(file_stem(IMAGE_URL), ".img$", "")
 export BASE_TAR := "build" / BASE_IMAGE + ".base.tar"
-export CUSTOM_TAR := "build" / BASE_IMAGE + ".tedge.tar"
+export CUSTOM_TAR := "build" / BASE_IMAGE + "." + PROFILE + ".tar"
 
-export VARIANT := ""
-export IMAGE_NAME := env_var_or_default("IMAGE_NAME", PREFIX + `date +'%Y%m%d%H%M'`)
-export OUTPUT_IMAGE := "build" / IMAGE_NAME + replace("." + VARIANT + ".img", "..", ".")
+export CUSTOMIZATION_PROFILE := "profiles" / PROFILE + ".toml"
+export VARIANT := "pi45"
+export IMAGE_CONFIG := "images/" + VARIANT + ".toml"
+export VERSION := env_var_or_default("VERSION", `date +'%Y%m%d%H%M'`)
+export IMAGE_NAME := PREFIX + PROFILE + "_" + VARIANT + "_" + VERSION
+export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".img"
 export BUILD_INFO := file_stem(IMAGE_NAME)
-
-set-image FILE="images/pi45.toml":
-    rm -f ./rugpi-bakery.toml
-    ln -s {{FILE}} ./rugpi-bakery.toml
 
 # Generate a version name (that can be used in follow up commands)
 generate_version:
-    @echo "{{IMAGE_NAME}}"
+    @echo "{{VERSION}}"
 
 # Show the install paths
 show:
     @echo "IMAGE_URL: {{IMAGE_URL}}"
     @echo "IMAGE_NAME: {{IMAGE_NAME}}"
+    @echo "CUSTOMIZATION_PROFILE: {{CUSTOMIZATION_PROFILE}}"
+    @echo "IMAGE_CONFIG: {{IMAGE_CONFIG}}"
+
     @echo "BASE_TAR: {{BASE_TAR}}"
     @echo "CUSTOM_TAR: {{CUSTOM_TAR}}"
+
     @echo "OUTPUT_IMAGE: {{OUTPUT_IMAGE}}"
+    @echo "VERSION: {{VERSION}}"
     @echo "BUILD_INFO: {{BUILD_INFO}}"
 
 # Clean build
@@ -40,11 +46,11 @@ extract:
 # Apply recipes to the base image
 customize:
     echo "{{BUILD_INFO}}" > "{{justfile_directory()}}/recipes/build-info/files/.build_info"
-    ./run-bakery customize "{{BASE_TAR}}" "{{CUSTOM_TAR}}"
+    ./run-bakery --config "{{CUSTOMIZATION_PROFILE}}" customize "{{BASE_TAR}}" "{{CUSTOM_TAR}}"
 
 # Create the image that can be flashed to an SD card or applied using the rugpi interface
 bake:
-    ./run-bakery bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
+    ./run-bakery --config "{{IMAGE_CONFIG}}" bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
     @echo ""
     @echo "Compressing image"
     xz -0 -v "{{OUTPUT_IMAGE}}"
@@ -70,3 +76,8 @@ build-local: customize bake
 # Publish latest image to Cumulocity
 publish:
     cd {{justfile_directory()}} && ./scripts/upload-c8y.sh
+
+build-all-variants: extract customize
+    # just VARIANT=pi023 bake
+    # just VARIANT=pi4 bake
+    just VARIANT=pi45 bake
