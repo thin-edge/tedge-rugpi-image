@@ -53,7 +53,8 @@ bake:
     ./run-bakery --config "{{IMAGE_CONFIG}}" bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
     @echo ""
     @echo "Compressing image"
-    xz -0 -v "{{OUTPUT_IMAGE}}"
+    sudo xz -0 -v "{{OUTPUT_IMAGE}}"
+    ls -l "{{OUTPUT_IMAGE}}"*
     @echo ""
     @echo ""
     @echo "Image created successfully. Check below for options on how to use the image"
