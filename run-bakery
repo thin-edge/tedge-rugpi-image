@@ -19,7 +19,8 @@ if [ -n "$CI" ]; then
     # file.
     ls -la build/
     echo "Checking build folder ownership: user=$(whoami)"
-    sudo chown "$(whoami)" -R build ||:
+    sudo chown "$(whoami):$(whoami)" -R build ||:
+    sudo chmod 777 build/* ||:
     echo "After chown"
     ls -la build/
 fi
