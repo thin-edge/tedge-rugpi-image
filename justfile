@@ -58,3 +58,7 @@ build-all: extract customize bake
 
 # Build the image from an already downloaded image
 build-local: customize bake
+
+# Publish latest image to Cumulocity
+publish:
+    cd {{justfile_directory()}} && ./scripts/upload-c8y.sh
