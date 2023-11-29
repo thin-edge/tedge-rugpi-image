@@ -27,7 +27,9 @@ jobs:
         run: echo "VERSION=$(just generate_version)" >> $GITHUB_ENV
 
       - name: Build image
-        run: just build-all-variants
+        run: |
+          mkdir build
+          just build-all-variants
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
