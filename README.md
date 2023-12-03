@@ -4,16 +4,18 @@ The repository can be used to build custom Raspberry Pi images with thin-edge.io
 
 ## Compatible devices
 
-**Using u-boot bootloader**
+**Using u-boot**
 
+* Raspberry PI 1B
 * Raspberry PI 2B Rev 1.2
+* Raspberry PI Zero
 * Raspberry PI Zero 2 W
 * Raspberry PI 3
 
-**Using tryboot bootloader**
+**Using tryboot**
 
-* Raspberry Pi 4 (using tryboot)
-* Raspberry Pi 5 (using tryboot)
+* Raspberry Pi 4
+* Raspberry Pi 5
 
 
 ## Images
