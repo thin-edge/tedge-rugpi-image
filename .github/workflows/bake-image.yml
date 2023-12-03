@@ -25,6 +25,7 @@ jobs:
   bake-image:
     name: Bake Image ${{ matrix.job.arch }} - ${{ matrix.job.profile }} - ${{ matrix.job.variant }}
     runs-on: ubuntu-latest
+    needs: info
     strategy:
       fail-fast: false
       matrix:
