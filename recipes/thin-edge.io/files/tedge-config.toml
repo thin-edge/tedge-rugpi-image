@@ -4,5 +4,6 @@ directory = "/etc/tedge"
 [[persist]]
 directory = "/var/log/tedge"
 
+# mosquitto db file must be persisted
 [[persist]]
-directory = "/etc/mosquitto"
+directory = "/var/lib/mosquitto"

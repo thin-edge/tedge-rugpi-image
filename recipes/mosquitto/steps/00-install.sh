@@ -6,7 +6,7 @@
 echo 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main' > /etc/apt/sources.list.d/debian-sid.list
 apt-get update
 
-DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Options::=--force-confnew -y --no-install-recommends install \
+DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Options::=--force-confold -y --no-install-recommends install \
     mosquitto \
     mosquitto-clients
 
