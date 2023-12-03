@@ -49,5 +49,5 @@ jobs:
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
-          name: tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{version}}
-          path: build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{version}}*.xz
+          name: tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}
+          path: build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.xz
