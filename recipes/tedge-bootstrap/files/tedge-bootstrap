@@ -68,8 +68,11 @@ set_hostname() {
     fi
     echo "$host_name" | tee /etc/hostname
     sed -i -E 's/^127.0.1.1.*/127.0.1.1\t'"$host_name"'/' /etc/hosts
-    hostnamectl set-hostname "$host_name"
-    systemctl restart avahi-daemon 2>/dev/null ||:
+    if ! hostnamectl set-hostname "$host_name"; then
+        log "hostnamectl failed, falling back to writing to /etc/hostname"
+        echo "$host_name" > /etc/hostname
+    fi
+    systemctl restart avahi-daemon --no-block 2>/dev/null ||:
 }
 
 if [ $# -gt 0 ]; then

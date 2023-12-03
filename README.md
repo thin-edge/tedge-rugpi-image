@@ -86,3 +86,9 @@ The default WIFI credentials are as follows, though it assumes that the given WI
     * pi45
 
     This profile will use pre-baked credentials for the WIFI which are defined in [profiles/wifi.toml](profiles/wifi.toml).
+
+### Building for Raspberry 1
+
+```sh
+just IMAGE_ARCH=armhf PROFILE=armhf VARIANT=pi01 build-all
+```

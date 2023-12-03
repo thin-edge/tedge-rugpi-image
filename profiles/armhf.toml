@@ -1,0 +1,26 @@
+recipes = [
+    "persist-root-home",
+    "ssh",
+    "zsh",
+    "persist-overlay",
+    "tedge-firmware-update",
+    "set-wifi",
+]
+exclude = ["mosquitto"]
+architecture = "armhf"
+
+[parameters.apt-cleanup]
+autoremove = true
+
+[parameters.ssh]
+root_authorized_keys = """
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfhQGWWw73ponAokdNSRZ5cQc9/CIX1TLQgYlr+BtObKoO4UNFP1YSbgK03GjhjeUid+QPmV+UURqxQTqLQoYWqUFP2CYkILFccVPmTvx9HLwupI+6QQKWfMDx9Djfph9GzInymaA5fT7hKppqittFrC/l3lkKgKTX5ohEOGshIbRgtgOYIaW3ByTx3urnaBbYCIgOyOZzSIyS0dUkwsiLu3XjPspgmn3Fs/+vofT/yhBe1carW0UM3ivV0JFfJzrxbCl/F7I2qwfjZXsypjkwlpNupUMuo3xPMi8YvNvyEu4d+IEAqO1dCcdGcxlkiHxrdITIpVLt5mjJ2LauHE/H bootstrap
+"""
+
+[parameters.set-wifi]
+# These values should be modified if you want to enable default wifi credentials in the image
+ssid = "onboarding_jail"
+password = "onboarding_jail"
+
+[parameters.rugpi-ctrl]
+rugpi_admin = true  # Enable Rugpi Admin.
