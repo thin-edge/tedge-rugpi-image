@@ -4,16 +4,18 @@ The repository can be used to build custom Raspberry Pi images with thin-edge.io
 
 ## Compatible devices
 
-**Using u-boot bootloader**
+**Using u-boot**
 
+* Raspberry PI 1B
 * Raspberry PI 2B Rev 1.2
+* Raspberry PI Zero
 * Raspberry PI Zero 2 W
 * Raspberry PI 3
 
-**Using tryboot bootloader**
+**Using tryboot**
 
-* Raspberry Pi 4 (using tryboot)
-* Raspberry Pi 5 (using tryboot)
+* Raspberry Pi 4
+* Raspberry Pi 5
 
 
 ## Images
@@ -86,3 +88,9 @@ The default WIFI credentials are as follows, though it assumes that the given WI
     * pi45
 
     This profile will use pre-baked credentials for the WIFI which are defined in [profiles/wifi.toml](profiles/wifi.toml).
+
+### Building for Raspberry 1 or Zero
+
+```sh
+just IMAGE_ARCH=armhf PROFILE=armhf VARIANT=pi01 build-all
+```

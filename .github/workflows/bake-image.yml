@@ -21,7 +21,7 @@ jobs:
       - uses: extractions/setup-just@v1
 
       - name: Install QEMU
-        run: docker run --privileged --rm tonistiigi/binfmt --install arm64
+        run: docker run --privileged --rm tonistiigi/binfmt --install arm64,armhf
 
       - name: Set image version
         run: echo "VERSION=$(just generate_version)" >> $GITHUB_ENV

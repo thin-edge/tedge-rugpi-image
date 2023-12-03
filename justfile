@@ -1,5 +1,10 @@
 
-export IMAGE_URL := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
+export IMAGE_URL_ARM64 := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
+export IMAGE_URL_ARMHF := "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-10-10/2023-10-10-raspios-bookworm-armhf-lite.img.xz"
+
+export IMAGE_ARCH := "arm64"
+
+export IMAGE_URL := if IMAGE_ARCH != "armhf" { IMAGE_URL_ARM64 } else { IMAGE_URL_ARMHF }
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
 
 export PREFIX := "tedge_rugpi_"
@@ -35,6 +40,10 @@ show:
     @echo "VERSION: {{VERSION}}"
     @echo "BUILD_INFO: {{BUILD_INFO}}"
 
+# Setup binfmt tools
+setup:
+    docker run --privileged --rm tonistiigi/binfmt --install arm64,armhf
+
 # Clean build
 clean:
     @rm -Rf build/
@@ -68,7 +77,7 @@ bake:
     @echo ""
 
 # Build the entire image
-build-all: extract customize bake
+build-all: setup extract customize bake
 
 # Build the image from an already downloaded image
 build-local: customize bake
