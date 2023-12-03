@@ -87,6 +87,6 @@ publish:
     cd {{justfile_directory()}} && ./scripts/upload-c8y.sh
 
 build-all-variants: extract customize
-    # just VARIANT=pi023 bake
+    just VARIANT=pi023 bake
     # just VARIANT=pi4 bake
     just VARIANT=pi45 bake

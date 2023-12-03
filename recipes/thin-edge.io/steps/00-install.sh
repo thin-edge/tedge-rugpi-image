@@ -7,10 +7,21 @@ echo "uname -a: $(uname -a)" | tee -a "${RECIPE_DIR}/build.log"
 echo "uname -m: $(uname -m)" | tee -a "${RECIPE_DIR}/build.log"
 echo
 
-curl -1sLf 'https://dl.cloudsmith.io/public/thinedge/community/gpg.2E65716592E5C6D4.key' | gpg --no-default-keyring --dearmor > /usr/share/keyrings/thinedge-community-archive-keyring.gpg
-
 # install thin-edge.io
-"${RECIPE_DIR}/files/thin-edge.io.sh" --channel main --arch armv6 2>&1 | tee -a "${RECIPE_DIR}/build.log"
+arch=$(uname -m)
+case "$arch" in
+    *arm7*)
+        # Due to differences between the build process and the target device, the arch
+        # used for installation needs to be forced to armv6.
+        echo "Using armv6 workaround" | tee -a "${RECIPE_DIR}/build.log"
+        curl -1sLf 'https://dl.cloudsmith.io/public/thinedge/community/gpg.2E65716592E5C6D4.key' | gpg --no-default-keyring --dearmor > /usr/share/keyrings/thinedge-community-archive-keyring.gpg
+        "${RECIPE_DIR}/files/thin-edge.io.sh" --channel main --arch armv6 2>&1 | tee -a "${RECIPE_DIR}/build.log"
+        ;;
+    *)
+        wget -O - thin-edge.io/install.sh | sh -s -- --channel main | tee -a "${RECIPE_DIR}/build.log"
+        ;;
+esac
+
 
 # Install collectd
 apt-get install -y -o DPkg::Options::=--force-confnew --no-install-recommends \
