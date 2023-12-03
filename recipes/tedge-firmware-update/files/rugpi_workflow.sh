@@ -20,8 +20,8 @@ _WORKDIR=$(pwd)
 # Change to a directory which is readable otherwise rugpi-ctrl can have problems reading the mounts
 cd /tmp || cd /
 
-HOT=$(rugpi-ctrl system info | grep Hot | cut -d: -f2 | xargs)
-DEFAULT=$(rugpi-ctrl system info | grep Default | cut -d: -f2 | xargs)
+HOT=$(rugpi-ctrl system info | grep Hot | cut -d: -f2 | tr '[:lower:]' '[:upper:]' | xargs)
+DEFAULT=$(rugpi-ctrl system info | grep Default | cut -d: -f2 | tr '[:lower:]' '[:upper:]' | xargs)
 
 ACTION="$1"
 shift
