@@ -1,1 +1,2 @@
 description = "install latest mosquitto version"
+priority = 200_000  # Execut before thin-edge.io
