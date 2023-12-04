@@ -1,0 +1,11 @@
+[[files]]
+type = "software-management"
+path = "/var/log/tedge/agent/software-*"
+
+[[files]]
+type = "firmware_update"
+path = "/var/log/tedge/agent/workflow-firmware_update-*"
+
+[[files]]
+type = "c8y_Command"
+path = "/var/log/tedge/agent/c8y_Command-*"
