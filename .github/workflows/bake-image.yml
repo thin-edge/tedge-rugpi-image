@@ -1,11 +1,11 @@
 name: Bake Image
-
+permissions:
+  contents: write
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - ci
+    tags:
+      - "*"
 
 jobs:
   info:
@@ -20,7 +20,18 @@ jobs:
           fetch-depth: 0
       - uses: extractions/setup-just@v1
       - id: step1
-        run: echo "version=$(just generate_version)" >> "$GITHUB_OUTPUT"
+        run: |
+          CURRENT_TAG=${GITHUB_REF#refs/*/}
+          case "$CURRENT_TAG" in
+            refs/tags/*)
+              echo "Using version from tag"
+              echo "version=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Using version from timestamp"
+              echo "version=$(just generate_version)" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
 
   bake-image:
     name: Bake Image ${{ matrix.job.arch }} - ${{ matrix.job.profile }} - ${{ matrix.job.variant }}
@@ -45,9 +56,35 @@ jobs:
         run: |
           mkdir build
           just IMAGE_ARCH=${{ matrix.job.arch }} PROFILE=${{ matrix.job.profile }} VARIANT=${{ matrix.job.variant }} build-all
+          mv recipes/sbom/debian-packages.list build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}.sbom.txt
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
           name: tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}
-          path: build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.xz
+          path: |
+            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.xz
+            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.sbom.txt
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - info
+      - bake-image
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          path: release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          generate_release_notes: true
+          draft: true
+          files: |
+            ./release/*
