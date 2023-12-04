@@ -22,15 +22,14 @@ jobs:
       - id: step1
         name: Get Version
         run: |
-          CURRENT_TAG=${GITHUB_REF#refs/*/}
-          case "$CURRENT_TAG" in
+          case "${GITHUB_REF}" in
             refs/tags/*)
               version="${GITHUB_REF#refs/*/}"
               echo "Using version from tag: $version"
               ;;
             *)
               version="$(just generate_version)"
-              echo "Using version from timetsamp: $version"
+              echo "Using version from timestamp: $version"
               ;;
           esac
           echo "version=$version" >> "$GITHUB_OUTPUT"
