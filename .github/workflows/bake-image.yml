@@ -20,18 +20,20 @@ jobs:
           fetch-depth: 0
       - uses: extractions/setup-just@v1
       - id: step1
+        name: Get Version
         run: |
           CURRENT_TAG=${GITHUB_REF#refs/*/}
           case "$CURRENT_TAG" in
             refs/tags/*)
-              echo "Using version from tag"
-              echo "version=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
+              version="${GITHUB_REF#refs/*/}"
+              echo "Using version from tag: $version"
               ;;
             *)
-              echo "Using version from timestamp"
-              echo "version=$(just generate_version)" >> "$GITHUB_OUTPUT"
+              version="$(just generate_version)"
+              echo "Using version from timetsamp: $version"
               ;;
           esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   bake-image:
     name: Bake Image ${{ matrix.job.arch }} - ${{ matrix.job.profile }} - ${{ matrix.job.variant }}
@@ -64,7 +66,7 @@ jobs:
           name: tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}
           path: |
             build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.xz
-            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.sbom.txt
+            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}.sbom.txt
 
   release:
     name: Release
