@@ -80,6 +80,8 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: release
+      - name: Show release artifacts
+        run: ls -l release/*/*
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
@@ -88,4 +90,4 @@ jobs:
           generate_release_notes: true
           draft: true
           files: |
-            ./release/*
+            ./release/*/*
