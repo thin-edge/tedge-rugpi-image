@@ -94,3 +94,8 @@ build-all-variants: extract customize
     just VARIANT=pi023 bake
     # just VARIANT=pi4 bake
     just VARIANT=pi45 bake
+
+# Trigger a release (by creating a tag)
+release:
+    git tag -a "{{VERSION}}" -m "{{VERSION}}"
+    git push origin "{{VERSION}}"
