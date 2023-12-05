@@ -7,3 +7,6 @@ directory = "/var/log/tedge"
 # mosquitto db file must be persisted
 [[persist]]
 directory = "/var/lib/mosquitto"
+
+[[persist]]
+file = "/etc/hosts"
