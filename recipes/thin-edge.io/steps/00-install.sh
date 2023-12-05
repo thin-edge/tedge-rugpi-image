@@ -10,7 +10,7 @@ echo
 # install thin-edge.io
 arch=$(uname -m)
 case "$arch" in
-    *arm7*)
+    *armv7*)
         # Due to differences between the build process and the target device, the arch
         # used for installation needs to be forced to armv6.
         echo "Using armv6 workaround" | tee -a "${RECIPE_DIR}/build.log"
