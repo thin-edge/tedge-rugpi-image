@@ -94,3 +94,52 @@ The default WIFI credentials are as follows, though it assumes that the given WI
 ```sh
 just IMAGE_ARCH=armhf PROFILE=armhf VARIANT=pi01 build-all
 ```
+
+## Project Tasks
+
+### Publishing a new release
+
+1. Ensure you have everything that you want to include in your image
+
+2. Trigger a release by using the following task:
+
+    ```
+    just release
+    ```
+
+    Take note of hte
+
+3. Wait for the Github action to complete
+
+4. Edit the newly created release in the Github Releases section of the repository
+
+5. Publish the release
+
+**Optional: Public images to Cumulocity IoT**
+
+
+You will need [go-c8y-cli](https://goc8ycli.netlify.app/) and [gh](https://cli.github.com/) tools for this!
+
+1. In the console, using go-c8y-cli, set your session to the tenant where you want to upload the firmware to
+
+    ```
+    set-session mytenant
+    ```
+
+2. Assuming you are still in the project's root directory
+
+    Using the release tag created in the previous step, run the following:
+
+    ```sh
+    just publish-external <TAG>
+    ```
+
+    Example
+
+    ```sh
+    just publish-external 20231206.0800
+    ```
+
+    This script will create firmware items (name and version) in Cumulocity IoT. The firmware versions will be just links to the external artifacts which are available from the Github Release artifacts.
+
+3. Now you can select the firmware in Cumulocity IoT to deploy to your devices (assuming you have flashed the base image to the device first ;)!
