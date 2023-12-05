@@ -86,6 +86,10 @@ build-local: customize bake
 publish:
     cd {{justfile_directory()}} && ./scripts/upload-c8y.sh
 
+# Publish a given github release to Cumulocity (using external urls)
+publish-external tag *args="":
+    cd {{justfile_directory()}} && ./scripts/c8y-publish-release.sh {{tag}} {{args}}
+
 build-all-variants: extract customize
     just VARIANT=pi023 bake
     # just VARIANT=pi4 bake
