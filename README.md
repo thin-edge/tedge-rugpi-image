@@ -107,7 +107,7 @@ just IMAGE_ARCH=armhf PROFILE=armhf VARIANT=pi01 build-all
     just release
     ```
 
-    Take note of hte
+    Take note of the git tag which is created as you will need this later if you want to add the firmware to the Cumulocity IoT firmware repository
 
 3. Wait for the Github action to complete
 

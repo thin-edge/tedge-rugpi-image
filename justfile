@@ -99,3 +99,6 @@ build-all-variants: extract customize
 release:
     git tag -a "{{VERSION}}" -m "{{VERSION}}"
     git push origin "{{VERSION}}"
+    @echo
+    @echo "Created release (tag): {{VERSION}}"
+    @echo
