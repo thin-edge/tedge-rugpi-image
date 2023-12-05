@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+RUGPI_INFO=$(rugpi-ctrl system info ||:)
+HOT=$(echo "$RUGPI_INFO" | grep Hot | cut -d: -f2 | xargs)
+DEFAULT=$(echo "$RUGPI_INFO" | grep Default | cut -d: -f2 | xargs)
+
+if [ "$HOT" = "$DEFAULT" ]; then
+    echo "Already on default partition. Nothing to rollback to. hot=$HOT, default=$DEFAULT" >&2
+    exit 0
+fi
+
+echo "Rebooting into default partition. hot=$HOT, default=$DEFAULT"
+reboot
+exit 0
