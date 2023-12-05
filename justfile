@@ -20,7 +20,7 @@ export IMAGE_CONFIG := "images/" + VARIANT + ".toml"
 export VERSION := env_var_or_default("VERSION", `date +'%Y%m%d.%H%M'`)
 export IMAGE_NAME := PREFIX + PROFILE + "_" + VARIANT + "_" + VERSION
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".img"
-export BUILD_INFO := file_stem(IMAGE_NAME)
+export BUILD_INFO := IMAGE_NAME
 
 # Generate a version name (that can be used in follow up commands)
 generate_version:
