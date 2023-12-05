@@ -1,0 +1,28 @@
+name: Deploy to Cumulocity
+on:
+  workflow_dispatch:
+  release:
+    types:
+      # Trigger on both prereleases and official releases
+      - published
+
+jobs:
+  deploy:
+    name: Publish to firmware repository
+    runs-on: ubuntu-latest
+    env:
+      C8Y_HOST: '${{ secrets.C8Y_HOST }}'
+      C8Y_USER: '${{ secrets.C8Y_USER }}'
+      C8Y_PASSWORD: '${{ secrets.C8Y_PASSWORD }}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: extractions/setup-just@v1
+      - uses: reubenmiller/setup-go-c8y-cli@main
+      - run: |
+          echo "Name: ${{ github.event.release.name }} Description: ${{ github.event.release.body }}"
+          just publish-external ${{ github.event.release.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
