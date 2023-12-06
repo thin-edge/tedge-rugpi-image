@@ -67,12 +67,15 @@ set_hostname() {
         return
     fi
     echo "$host_name" | tee /etc/hostname
-    sed -i -E 's/^127.0.1.1.*/127.0.1.1\t'"$host_name"'/' /etc/hosts
+
     if ! hostnamectl set-hostname "$host_name"; then
         log "hostnamectl failed, falling back to writing to /etc/hostname"
         echo "$host_name" > /etc/hostname
     fi
     systemctl restart avahi-daemon --no-block 2>/dev/null ||:
+
+    # enable local network calls to reference current host name
+    sed -i -E 's/^127.0.1.1.*/127.0.1.1\t'"$host_name"'/' /etc/hosts
 }
 
 if [ $# -gt 0 ]; then
