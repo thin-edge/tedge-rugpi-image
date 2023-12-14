@@ -52,7 +52,7 @@ on_success = "successful"
 on_error = { status = "rollback_restart", reason = "Commit failed. Rolling back to default partition" }
 
 [rollback_restart]
-script = "restart"
+action = "restart"
 on_exec = "restarting"  # Internal state used by the "restart" action
 on_success = "rollback_successful"
 
