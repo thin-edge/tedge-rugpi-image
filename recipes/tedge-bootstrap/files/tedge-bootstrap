@@ -78,15 +78,11 @@ set_hostname() {
 set_etc_hosts() {
     # enable local network calls to reference current host name
     host_name="$1"
-    retries=10
-    while [ "$retries" -gt 0 ]; do
-        if sed -i -E 's/^127.0.1.1.*/127.0.1.1\t'"$host_name"'/' /etc/hosts; then
-            break
-        fi
-        retries=$((retries - 1))
-        log "Failed to set /etc/hosts record. Retries left $retries"
-        sleep 2
-    done
+    cp /etc/hosts /tmp/hosts.new
+    sed -i -E 's/^127.0.1.1.*/127.0.1.1\t'"$host_name"'/' /tmp/hosts.new
+    log "Replacing /etc/hosts with updated file"
+    cp -f /tmp/hosts.new /etc/hosts
+    log "Successfully updated /etc/hosts"
 }
 
 if [ $# -gt 0 ]; then
