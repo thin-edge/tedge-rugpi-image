@@ -170,7 +170,7 @@ download() {
         log "Downloaded file from: $tedge_url"
         update_state "$(printf '{"url":"%s"}\n' "$local_file")"
     else
-        log "Converted to local url: $url => $tedge_url"
+        log "Replacing url with a tedge url: $tedge_url"
         update_state "$(printf '{"url":"%s"}\n' "$tedge_url")"
     fi
 }
