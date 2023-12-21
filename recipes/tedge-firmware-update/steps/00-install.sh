@@ -4,7 +4,7 @@ install -D -m 644 "${RECIPE_DIR}/files/tedge-firmware" -t /etc/sudoers.d/
 install -D -m 644 "${RECIPE_DIR}/files/system.toml" -t /etc/tedge/
 install -D -m 644 "${RECIPE_DIR}/files/firmware_update.rugpi.toml" -t /usr/share/tedge-workflows/
 install -D -m 755 "${RECIPE_DIR}/files/rugpi_workflow.sh" -t /usr/bin/
-install -D -m 755 "${RECIPE_DIR}/files/firmware-version" /usr/share/tedge-inventory/scripts.d/80_c8y_Firmware
+install -D -m 755 "${RECIPE_DIR}/files/firmware-version" /usr/share/tedge-inventory/scripts.d/80_firmware
 
 # auto rollback service incase if new agent is corrupt (only rely on tooling which is definitely there)
 install -D -m 755 "${RECIPE_DIR}/files/firmware-auto-rollback" /usr/bin/firmware-auto-rollback

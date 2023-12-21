@@ -112,9 +112,9 @@ fi
 
 # set device type
 # FIXME: Work out a better way to get the device type, maybe extend tedge-identity to include device info, it could also
-# be referenced from 80_c8y_Firmware
-if [ -f /usr/share/tedge-inventory/scripts.d/80_c8y_Firmware ]; then
-    DEVICE_TYPE=$(/usr/share/tedge-inventory/scripts.d/80_c8y_Firmware | grep "name=" | cut -d= -f2 | tr -d '"' | xargs)
+# be referenced from 80_firmware
+if [ -f /usr/share/tedge-inventory/scripts.d/80_firmware ]; then
+    DEVICE_TYPE=$(/usr/share/tedge-inventory/scripts.d/80_firmware | grep "name=" | cut -d= -f2 | tr -d '"' | xargs)
     if [ -n "$DEVICE_TYPE" ]; then
         log "Setting device.type to $DEVICE_TYPE"
         tedge config set device.type "$DEVICE_TYPE"
