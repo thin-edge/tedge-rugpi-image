@@ -73,6 +73,12 @@ get_model_type() {
         Raspberry\ Pi\ Zero\ W\ Rev*)
             MODEL_PREFIX=rpizero
             ;;
+        Raspberry\ Pi\ Compute\ Module\ 3*)
+            MODEL_PREFIX=rpicm3
+            ;;
+        Raspberry\ Pi\ Compute\ Module\ 4*)
+            MODEL_PREFIX=rpicm4
+            ;;
         *)
             MODEL_PREFIX=unknown
             ;;
