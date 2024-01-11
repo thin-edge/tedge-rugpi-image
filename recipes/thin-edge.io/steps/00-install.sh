@@ -52,3 +52,7 @@ fi
 
 # Persist tedge configuration and related components (e.g. mosquitto)
 install -D -m 644 "${RECIPE_DIR}/files/tedge-config.toml" -t /etc/rugpi/state
+
+# Add default plugin configurations
+install -D -m 644 -g tedge -o tedge "${RECIPE_DIR}/files/tedge-configuration-plugin.toml" -t /etc/tedge/plugins/
+install -D -m 644 -g tedge -o tedge "${RECIPE_DIR}/files/tedge-log-plugin.toml" -t /etc/tedge/plugins/
