@@ -1,3 +1,4 @@
 description = "install latest docker version"
 priority = 10_000
 dependencies = ["thin-edge.io"]
+default = false
