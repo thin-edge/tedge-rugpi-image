@@ -1,0 +1,2 @@
+description = "install latest docker version"
+priority = 200_000  # Execut before thin-edge.io
