@@ -4,3 +4,4 @@ recipes/build-info/files/.build_info
 **/debian-packages.list
 rugpi-bakery.toml
 *.log
+core
