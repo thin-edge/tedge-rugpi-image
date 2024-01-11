@@ -41,8 +41,10 @@ show:
     @echo "BUILD_INFO: {{BUILD_INFO}}"
 
 # Setup binfmt tools
+# Note: technically only arm64,armhf are required, however install 'all' avoids the error message
+# on arm64 hosts
 setup:
-    docker run --privileged --rm tonistiigi/binfmt --install arm64,armhf
+    docker run --privileged --rm tonistiigi/binfmt --install all
 
 # Clean build
 clean:
