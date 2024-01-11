@@ -1,6 +1,6 @@
 
-export IMAGE_URL_ARM64 := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-10-10/2023-10-10-raspios-bookworm-arm64-lite.img.xz"
-export IMAGE_URL_ARMHF := "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-10-10/2023-10-10-raspios-bookworm-armhf-lite.img.xz"
+export IMAGE_URL_ARM64 := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-12-11/2023-12-11-raspios-bookworm-arm64-lite.img.xz"
+export IMAGE_URL_ARMHF := "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-12-11/2023-12-11-raspios-bookworm-armhf-lite.img.xz"
 
 export IMAGE_ARCH := "arm64"
 
@@ -41,8 +41,10 @@ show:
     @echo "BUILD_INFO: {{BUILD_INFO}}"
 
 # Setup binfmt tools
+# Note: technically only arm64,armhf are required, however install 'all' avoids the error message
+# on arm64 hosts
 setup:
-    docker run --privileged --rm tonistiigi/binfmt --install arm64,armhf
+    docker run --privileged --rm tonistiigi/binfmt --install all
 
 # Clean build
 clean:
