@@ -4,7 +4,7 @@ echo "Setting wifi access"
 
 cat << EOT > /etc/NetworkManager/system-connections/wifi.nmconnection
 [connection]
-id=asio uplink
+id=${RECIPE_PARAM_ID}
 uuid=354ca6a0-bc96-4a29-82f4-c7cbc6e43fac
 type=wifi
 

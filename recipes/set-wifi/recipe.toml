@@ -2,5 +2,6 @@ description = "Set wifi access"
 default = false
 
 [parameters]
+id = { default = "wifi" }
 ssid = {}
 password = {}
