@@ -2,5 +2,4 @@ architecture = "armhf"
 
 boot_flow = "u-boot"
 
-# Make image generic so it can be used for pi4 and pi5
 include_firmware = "none"
