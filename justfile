@@ -76,7 +76,7 @@ release:
 # Help users to select the correct image for them
 #
 build-pi1:
-    just IMAGE=u-boot-armhf build compress
+    just IMAGE=u-boot-armhf build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi1"
@@ -85,7 +85,7 @@ build-pi1:
     @echo
 
 build-pizero:
-    just IMAGE=u-boot-armhf build compress
+    just IMAGE=u-boot-armhf build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi1"
@@ -94,7 +94,7 @@ build-pizero:
     @echo
 
 build-pi2:
-    just IMAGE=u-boot build compress
+    just IMAGE=u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -103,7 +103,7 @@ build-pi2:
     @echo
 
 build-pi3:
-    just IMAGE=u-boot build compress
+    just IMAGE=u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -112,7 +112,7 @@ build-pi3:
     @echo
 
 build-pizero2w:
-    just IMAGE=u-boot build compress
+    just IMAGE=u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -120,7 +120,7 @@ build-pizero2w:
     @echo
 
 build-pi4:
-    just IMAGE=tryboot build compress
+    just IMAGE=tryboot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
@@ -128,14 +128,14 @@ build-pi4:
     @echo
 
 build-pi4-include-firmware:
-    just IMAGE=pi4 build compress
+    just IMAGE=pi4 build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
     @echo
 
 build-pi5:
-    just IMAGE=tryboot build compress
+    just IMAGE=tryboot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
