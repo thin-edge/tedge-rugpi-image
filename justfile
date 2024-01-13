@@ -5,7 +5,7 @@ export IMAGE_URL_ARMHF := "https://downloads.raspberrypi.org/raspios_lite_armhf/
 export IMAGE_ARCH := "arm64"
 
 export IMAGE_URL := if IMAGE_ARCH != "armhf" { IMAGE_URL_ARM64 } else { IMAGE_URL_ARMHF }
-export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:latest"
+export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:v0.5"
 
 export PREFIX := "tedge_rugpi_"
 export PROFILE := "default"

@@ -3,7 +3,7 @@
 set -e
 
 DOCKER=${DOCKER:-docker}
-RUGPI_IMAGE=${RUGPI_IMAGE:-ghcr.io/silitics/rugpi-bakery:latest}
+RUGPI_IMAGE=${RUGPI_IMAGE:-ghcr.io/silitics/rugpi-bakery:v0.5}
 
 $DOCKER run --rm --privileged \
     -v "$(pwd)":/project \
