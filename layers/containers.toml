@@ -1,0 +1,7 @@
+name = "containers"
+parent = "tedge-rugpi-core/tedge"
+
+recipes = [
+    "tedge-rugpi-core/defaults",
+    "tedge-rugpi-core/docker",
+]

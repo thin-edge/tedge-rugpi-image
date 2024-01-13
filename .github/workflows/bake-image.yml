@@ -12,14 +12,14 @@ jobs:
     name: Build information
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.step1.outputs.version }}
+      version: ${{ steps.info.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: extractions/setup-just@v1
-      - id: step1
+      - id: info
         name: Get Version
         run: |
           case "${GITHUB_REF}" in
@@ -35,37 +35,53 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
   bake-image:
-    name: Bake Image ${{ matrix.job.arch }} - ${{ matrix.job.profile }} - ${{ matrix.job.variant }}
+    name: Bake Image ${{ matrix.job.image }}
     runs-on: ubuntu-latest
     needs: info
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { arch: armhf, profile: armhf, variant: pi01 }
-          - { arch: arm64, profile: default, variant: pi023 }
-          - { arch: arm64, profile: default, variant: pi4 }
-          - { arch: arm64, profile: default, variant: pi45 }
+          - { image: pi4 }
+          - { image: tryboot }
+          - { image: u-boot }
+          - { image: u-boot-armhf }
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: extractions/setup-just@v1
+      - name: Install dependencies
+        run: just setup
+      - id: info
+        env:
+          VERSION: ${{needs.info.outputs.version}}
+        run: |
+          source <(just show)
+          echo "PREFIX=$PREFIX" >> "$GITHUB_OUTPUT"
+      - name: Configure .env
+        env:
+          IMAGE_CONFIG: ${{secrets.IMAGE_CONFIG || ''}}
+        run: |
+          echo "IMAGE_NAME=${{ steps.info.outputs.PREFIX }}${{ matrix.job.image }}_${{ needs.info.outputs.version }}" > ".env"
+          if [ -n "$IMAGE_CONFIG" ]; then
+            echo "Adding custom IMAGE_CONFIG settings to .env"
+            echo "$IMAGE_CONFIG" >> ".env"
+          fi
+
       - name: Build image
         env:
           VERSION: ${{needs.info.outputs.version}}
         run: |
-          mkdir build
-          just IMAGE_ARCH=${{ matrix.job.arch }} PROFILE=${{ matrix.job.profile }} VARIANT=${{ matrix.job.variant }} build-all
-          mv recipes/sbom/debian-packages.list build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}.sbom.txt
+          just IMAGE=${{ matrix.job.image }} build
 
       - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
-          name: tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}
+          name: ${{ steps.info.outputs.PREFIX }}${{ matrix.job.image }}_${{ needs.info.outputs.version }}
           path: |
-            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}*.xz
-            build/tedge_rugpi_${{matrix.job.profile}}_${{matrix.job.variant}}_${{needs.info.outputs.version}}.sbom.txt
+            build/
+            *.sbom.txt
 
   release:
     name: Release

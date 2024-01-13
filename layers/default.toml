@@ -1,0 +1,6 @@
+name = "default"
+parent = "tedge-rugpi-core/tedge"
+
+recipes = [
+    "tedge-rugpi-core/defaults",
+]
