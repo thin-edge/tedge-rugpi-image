@@ -1,14 +1,12 @@
 set dotenv-load
 
-export IMAGE := "tryboot"
-
 export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:feat-layers"
 
 export PREFIX := "tedge_rugpi_"
+export IMAGE := "tryboot"
 export VERSION := env_var_or_default("VERSION", `date +'%Y%m%d.%H%M'`)
 export IMAGE_NAME := PREFIX + IMAGE + "_" + VERSION
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".img"
-export BUILD_INFO := IMAGE_NAME
 
 # Generate a version name (that can be used in follow up commands)
 generate_version:
