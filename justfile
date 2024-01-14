@@ -26,8 +26,12 @@ show:
 setup:
     docker run --privileged --rm tonistiigi/binfmt --install all
 
+# Clean rugpi repository cache (to force running recipes to build an image)
+clean-cache:
+    @rm -Rf .rugpi/repositories
+
 # Clean rugpi cache and build folders
-clean:
+clean-all:
     @rm -Rf .rugpi
     @rm -Rf build/
 
