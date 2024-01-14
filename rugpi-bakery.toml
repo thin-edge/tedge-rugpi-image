@@ -2,9 +2,11 @@
 rugpi-extra = { git = "https://github.com/silitics/rugpi-extra.git" }
 tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git" }
 
+# Image for Raspberry Pi 4, 5, CM4, 400
 [images.tryboot]
 layer = "default"
 
+# Image for Raspberry Pi 4, 5, CM4, 400 - includes containerization dependencies
 [images.tryboot-containers]
 layer = "containers"
 
@@ -16,6 +18,11 @@ include_firmware = "pi4"
 # An image using the U-Boot boot flow for Raspberry Pi 3 and Zero 2.
 [images.u-boot]
 layer = "default"
+boot_flow = "u-boot"
+
+# An image using the U-Boot boot flow for Raspberry Pi 3 and Zero 2 with containerization dependencies
+[images.u-boot-containers]
+layer = "containers"
 boot_flow = "u-boot"
 
 # An `armhf` image for older Raspberry Pi's using the U-Boot boot flow.
