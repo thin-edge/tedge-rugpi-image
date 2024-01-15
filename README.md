@@ -27,6 +27,7 @@ The following images are included in this repository.
 |Image|Description|
 |-------|-----------|
 |tryboot|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader|
+|tryboot-containers|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader and with docker pre-installed|
 |rpi4|Raspberry Pi 4 image which includes the firmware to enable tryboot bootloader|
 |u-boot|Image for Raspberry Pi 2, 3, zero 2W|
 |u-boot-armhf|Image for Raspberry Pi 1 and zero|
@@ -37,13 +38,21 @@ The following images are included in this repository.
 
 To run the build tasks, install [just](https://just.systems/man/en/chapter_5.html).
 
-1. Create a custom `.env` file which will be used to store secrets
+1. Clone the repository (use the `next` branch by default)
+
+    ```sh
+    git clone -b next https://github.com/thin-edge/tedge-rugpi-image.git
+    ```
+
+2. Create a custom `.env` file which will be used to store secrets
 
     ```sh
     cp env.template .env
     ```
 
-2. Edit the `.env` file
+    The `.env` file will not be committed to the repo
+
+3. Edit the `.env` file
 
     If your device does not have an ethernet adapter, or you the device to connect to a Wifi network for onboarding, then you will have to add the Wifi credentials to the `.env` file.
 
@@ -59,7 +68,7 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 
     If an image has Wifi credentials baked in, then you should not make this image public, as it would expose your credentials! 
 
-3. Create the image (including downloading the supported base Raspberry Pi image) using:
+4. Create the image (including downloading the supported base Raspberry Pi image) using:
 
     ```sh
     just IMAGE=tryboot build
@@ -76,9 +85,13 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     just IMAGE=tryboot build
     ```
 
-4. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
+5. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
 
-5. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
+6. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
+
+    **Notes**
+
+    You can apply image updates via the device's localhost:8088 interface, however you will have to uncompress the `.xz` image file to a `.img` file.
 
 For further information on Rugpi, checkout the [quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
 
