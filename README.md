@@ -1,5 +1,7 @@
 # thin-edge.io image using rugpi
 
+:warning: This repository is using a new [layers features](https://github.com/silitics/rugpi/tree/feat-layers) from Rugpi. It is currently under development.
+
 The repository can be used to build custom Raspberry Pi images with thin-edge.io and Rugpi for robust OTA Operation System updates.
 
 ## Compatible devices
@@ -31,7 +33,7 @@ The following images are included in this repository.
 
 ## Building
 
-### Building an image without WIFI credentials (devices must have an ethernet adapter!)
+### Building an image
 
 To run the build tasks, install [just](https://just.systems/man/en/chapter_5.html).
 
@@ -43,7 +45,7 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 
 2. Edit the `.env` file
 
-    If you want to include wifi credentials in your image, then edit the values in the `.env` file:
+    If your device does not have an ethernet adapter, or you the device to connect to a Wifi network for onboarding, then you will have to add the Wifi credentials to the `.env` file.
 
     ```sh
     SECRETS_WIFI_SSID=example
@@ -53,13 +55,24 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 
     **Note**
 
-    If you include wifi credentials in your image, make sure you don't make the image public, as it would expose your credentials!
+    The Wifi credentials only need to be included in the image that is flashed to the SD card. Subsequent images don't need to included the Wifi credentials, as the network connection configuration files are persisted across images.
 
-    Alternatively, you could build an image locally which includes the wifi credentials, and then any future builds you don't need to include the wifi credentials as they should be persisted.
+    If an image has Wifi credentials baked in, then you should not make this image public, as it would expose your credentials! 
 
 3. Create the image (including downloading the supported base Raspberry Pi image) using:
 
     ```sh
+    just IMAGE=tryboot build
+    ```
+
+    **Note**
+
+    If you notice that the recipes are not being run, then you can clear the cache by running the following command:
+
+    ```sh
+    just clean-cache
+
+    # Then you can rebuild the image and the recipes should be run
     just IMAGE=tryboot build
     ```
 
@@ -190,9 +203,8 @@ You can customize the images built by the Github workflow by creating a secret w
     **Value**
 
     ```sh
-    SECRETS_WIFI_SSID="mywifi"
-    SECRETS_WIFI_PASSWORD="somepassword"
     SSH_KEYS_bootstrap="ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx bootstrap"
+    SSH_KEYS_seconduser="ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx myseconduser"
     ```
 
     Remove any lines which are not applicable to your build.
