@@ -1,0 +1,12 @@
+name = "default"
+parent = "tedge-rugpi-core/tedge"
+
+recipes = [
+    "tedge-rugpi-core/defaults",
+]
+
+[parameters."core/apt-cleanup"]
+autoremove = true
+
+[parameters."core/rugpi-ctrl"]
+rugpi_admin = true  # Enable Rugpi Admin.

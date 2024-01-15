@@ -1,26 +1,12 @@
+set dotenv-load
 
-export IMAGE_URL_ARM64 := "https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-12-11/2023-12-11-raspios-bookworm-arm64-lite.img.xz"
-export IMAGE_URL_ARMHF := "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-12-11/2023-12-11-raspios-bookworm-armhf-lite.img.xz"
-
-export IMAGE_ARCH := "arm64"
-
-export IMAGE_URL := if IMAGE_ARCH != "armhf" { IMAGE_URL_ARM64 } else { IMAGE_URL_ARMHF }
-export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:v0.5"
+export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:feat-layers"
 
 export PREFIX := "tedge_rugpi_"
-export PROFILE := "default"
-
-export BASE_IMAGE := replace_regex(file_stem(IMAGE_URL), ".img$", "")
-export BASE_TAR := "build" / BASE_IMAGE + ".base.tar"
-export CUSTOM_TAR := "build" / BASE_IMAGE + "." + PROFILE + ".tar"
-
-export CUSTOMIZATION_PROFILE := "profiles" / PROFILE + ".toml"
-export VARIANT := "pi45"
-export IMAGE_CONFIG := "images/" + VARIANT + ".toml"
+export IMAGE := "tryboot"
 export VERSION := env_var_or_default("VERSION", `date +'%Y%m%d.%H%M'`)
-export IMAGE_NAME := PREFIX + PROFILE + "_" + VARIANT + "_" + VERSION
+export IMAGE_NAME := PREFIX + IMAGE + "_" + VERSION
 export OUTPUT_IMAGE := "build" / IMAGE_NAME + ".img"
-export BUILD_INFO := IMAGE_NAME
 
 # Generate a version name (that can be used in follow up commands)
 generate_version:
@@ -28,17 +14,11 @@ generate_version:
 
 # Show the install paths
 show:
-    @echo "IMAGE_URL: {{IMAGE_URL}}"
-    @echo "IMAGE_NAME: {{IMAGE_NAME}}"
-    @echo "CUSTOMIZATION_PROFILE: {{CUSTOMIZATION_PROFILE}}"
-    @echo "IMAGE_CONFIG: {{IMAGE_CONFIG}}"
-
-    @echo "BASE_TAR: {{BASE_TAR}}"
-    @echo "CUSTOM_TAR: {{CUSTOM_TAR}}"
-
-    @echo "OUTPUT_IMAGE: {{OUTPUT_IMAGE}}"
-    @echo "VERSION: {{VERSION}}"
-    @echo "BUILD_INFO: {{BUILD_INFO}}"
+    @echo "PREFIX={{PREFIX}}"
+    @echo "IMAGE={{IMAGE}}"
+    @echo "IMAGE_NAME={{IMAGE_NAME}}"
+    @echo "VERSION={{VERSION}}"
+    @echo "OUTPUT_IMAGE={{OUTPUT_IMAGE}}"
 
 # Setup binfmt tools
 # Note: technically only arm64,armhf are required, however install 'all' avoids the error message
@@ -46,23 +26,24 @@ show:
 setup:
     docker run --privileged --rm tonistiigi/binfmt --install all
 
-# Clean build
-clean:
+# Clean rugpi repository cache (to force running recipes to build an image)
+clean-cache:
+    @rm -Rf .rugpi/repositories
+
+# Clean rugpi cache and build folders
+clean-all:
+    @rm -Rf .rugpi
     @rm -Rf build/
 
-# Download and extract the base image
-extract:
-    ./run-bakery extract "{{IMAGE_URL}}" "{{BASE_TAR}}"
-
-# Apply recipes to the base image
-customize:
-    echo "{{BUILD_INFO}}" > "{{justfile_directory()}}/recipes/build-info/files/.build_info"
-    ./run-bakery --config "{{CUSTOMIZATION_PROFILE}}" customize "{{BASE_TAR}}" "{{CUSTOM_TAR}}"
-
 # Create the image that can be flashed to an SD card or applied using the rugpi interface
-bake:
-    ./run-bakery --config "{{IMAGE_CONFIG}}" bake "{{CUSTOM_TAR}}" "{{OUTPUT_IMAGE}}"
-    @echo ""
+build:
+    mkdir -p "{{parent_directory(OUTPUT_IMAGE)}}"
+    echo "{{IMAGE_NAME}}" > {{justfile_directory()}}/.image
+    ./run-bakery bake image {{IMAGE}} {{OUTPUT_IMAGE}}
+    just VERSION={{VERSION}} IMAGE={{IMAGE}} compress
+
+# Compress
+compress:
     @echo "Compressing image"
     scripts/compress.sh "{{OUTPUT_IMAGE}}"
     @echo ""
@@ -78,11 +59,6 @@ bake:
     @echo "    {{justfile_directory()}}/{{OUTPUT_IMAGE}}.xz"
     @echo ""
 
-# Build the entire image
-build-all: setup extract customize bake
-
-# Build the image from an already downloaded image
-build-local: customize bake
 
 # Publish latest image to Cumulocity
 publish:
@@ -92,15 +68,80 @@ publish:
 publish-external tag *args="":
     cd {{justfile_directory()}} && ./scripts/c8y-publish-release.sh {{tag}} {{args}}
 
-build-all-variants: extract customize
-    just VARIANT=pi023 bake
-    # just VARIANT=pi4 bake
-    just VARIANT=pi45 bake
-
 # Trigger a release (by creating a tag)
 release:
     git tag -a "{{VERSION}}" -m "{{VERSION}}"
     git push origin "{{VERSION}}"
     @echo
     @echo "Created release (tag): {{VERSION}}"
+    @echo
+
+#
+# Help users to select the correct image for them
+#
+build-pi1:
+    just IMAGE=u-boot-armhf build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi1"
+    @echo "  * pi2 (early models)"
+    @echo "  * pizero"
+    @echo
+
+build-pizero:
+    just IMAGE=u-boot-armhf build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi1"
+    @echo "  * pi2 (early models)"
+    @echo "  * pizero"
+    @echo
+
+build-pi2:
+    just IMAGE=u-boot build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi2"
+    @echo "  * pi3"
+    @echo "  * pizero2"
+    @echo
+
+build-pi3:
+    just IMAGE=u-boot build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi2"
+    @echo "  * pi3"
+    @echo "  * pizero2"
+    @echo
+
+build-pizero2w:
+    just IMAGE=u-boot build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi2"
+    @echo "  * pi3"
+    @echo
+
+build-pi4:
+    just IMAGE=tryboot build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi4"
+    @echo "  * pi5"
+    @echo
+
+build-pi4-include-firmware:
+    just IMAGE=pi4 build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi4"
+    @echo
+
+build-pi5:
+    just IMAGE=tryboot build
+    @echo
+    @echo "This image can be applied to"
+    @echo "  * pi4"
+    @echo "  * pi5"
     @echo

@@ -1,3 +1,0 @@
-boot_flow = "u-boot"
-
-include_firmware = "none"

@@ -1,0 +1,13 @@
+name = "containers"
+parent = "tedge-rugpi-core/tedge"
+
+recipes = [
+    "tedge-rugpi-core/defaults",
+    "tedge-rugpi-core/docker",
+]
+
+[parameters."core/apt-cleanup"]
+autoremove = true
+
+[parameters."core/rugpi-ctrl"]
+rugpi_admin = true  # Enable Rugpi Admin.
