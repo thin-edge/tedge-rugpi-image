@@ -44,7 +44,17 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     git clone -b next https://github.com/thin-edge/tedge-rugpi-image.git
     ```
 
-2. Create a custom `.env` file which will be used to store secrets
+2. Install the dependencies
+
+    ```sh
+    just setup
+    ```
+
+    **Notes**
+
+    This step is required to allow you to run binaries built for different CPU architectures, e.g. building an aarch64 or armhf image on a x86_64 machine.
+
+3. Create a custom `.env` file which will be used to store secrets
 
     ```sh
     cp env.template .env
@@ -52,7 +62,7 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 
     The `.env` file will not be committed to the repo
 
-3. Edit the `.env` file
+4. Edit the `.env` file
 
     If your device does not have an ethernet adapter, or you the device to connect to a Wifi network for onboarding, then you will have to add the Wifi credentials to the `.env` file.
 
@@ -68,7 +78,7 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 
     If an image has Wifi credentials baked in, then you should not make this image public, as it would expose your credentials! 
 
-4. Create the image (including downloading the supported base Raspberry Pi image) using:
+5. Create the image (including downloading the supported base Raspberry Pi image) using:
 
     ```sh
     just IMAGE=tryboot build
@@ -85,9 +95,9 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     just IMAGE=tryboot build
     ```
 
-5. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
+6. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
 
-6. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
+7. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
 
     **Notes**
 
