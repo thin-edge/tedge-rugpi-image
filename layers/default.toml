@@ -3,6 +3,7 @@ parent = "tedge-rugpi-core/tedge"
 
 recipes = [
     "tedge-rugpi-core/defaults",
+    "tedge-rugpi-core/debug",
 ]
 
 [parameters."core/apt-cleanup"]
@@ -10,3 +11,8 @@ autoremove = true
 
 [parameters."core/rugpi-ctrl"]
 rugpi_admin = true  # Enable Rugpi Admin.
+
+# Only enable if you want the mqtt-logger to start by default
+# though be careful as the log can get large
+[parameters."tedge-rugpi-core/mqtt-logger"]
+enable_service = true
