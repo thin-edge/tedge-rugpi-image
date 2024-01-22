@@ -1,6 +1,6 @@
 [repositories]
 rugpi-extra = { git = "https://github.com/silitics/rugpi-extra.git" }
-tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git" }
+tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git", branch = "feat-debug-logger" }
 
 # Image for Raspberry Pi 4, 5, CM4, 400
 [images.tryboot]
