@@ -1,4 +1,4 @@
-# thin-edge.io image using rugpi
+# thin-edge.io image using Rugpi
 
 :warning: This repository is using a new [layers features](https://github.com/silitics/rugpi/tree/feat-layers) from Rugpi. It is currently under development.
 
@@ -84,24 +84,13 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
     just IMAGE=tryboot build
     ```
 
-    **Note**
-
-    If you notice that the recipes are not being run, then you can clear the cache by running the following command:
-
-    ```sh
-    just clean-cache
-
-    # Then you can rebuild the image and the recipes should be run
-    just IMAGE=tryboot build
-    ```
-
 6. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
 
 7. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
 
     **Notes**
 
-    You can apply image updates via the device's localhost:8088 interface, however you will have to uncompress the `.xz` image file to a `.img` file.
+    You can apply image updates via the device's localhost:8088 interface, however you will have to expand the `.xz` image file to a `.img` file.
 
 For further information on Rugpi, checkout the [quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
 
