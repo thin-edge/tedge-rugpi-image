@@ -24,7 +24,7 @@ show:
 # Note: technically only arm64,armhf are required, however install 'all' avoids the error message
 # on arm64 hosts
 setup:
-    docker run --privileged --rm tonistiigi/binfmt --install all
+    docker run --privileged --rm tonistiigi/binfmt --install all >/dev/null
 
 # Clean rugpi repository cache (to force running recipes to build an image)
 clean-cache:
