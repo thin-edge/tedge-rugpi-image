@@ -1,4 +1,0 @@
-boot_flow = "tryboot"
-
-# Include firmware as some older pi4 need a firmware update before tryboot will work
-include_firmware = "pi4"

@@ -1,6 +1,6 @@
-# thin-edge.io image using rugpi
+# thin-edge.io image using Rugpi
 
-The repository can be used to build custom Raspberry Pi images with thin-edge.io and Rugpi for robust OTA Operation System updates.
+The repository can be used to build custom Raspberry Pi images with thin-edge.io and [Rugpi](https://oss.silitics.com/rugpi/) for robust OTA Operating System updates.
 
 ## Compatible devices
 
@@ -22,77 +22,121 @@ The repository can be used to build custom Raspberry Pi images with thin-edge.io
 
 The following images are included in this repository.
 
-A profile determines what software and configuration is included in the image.
-
-A variant is more hardware specific which uses the same profile but makes hardware specific tweaks based on the hardware limitations. For example Raspberry 2, 3 and Zero 2 W do not support the tryboot feature, so instead the u-boot bootloader is used to facilitate the robust OTA image updates.
-
-The following sections describe the profiles and variants available.
-
-### Profiles
-
-|Profile|Description|
+|Image|Description|
 |-------|-----------|
-|default|Default image which does not include WiFi credentials|
-|wifi|All the contents of the default image but also has WiFi credentials included in the image. Suitable for devices without an ethernet adapter|
-
-
-### Variants
-
-|Variant|Supported Raspberry Pi Versions|Description|
-|-------|-------------------------------|-----------|
-|pi45|4 and 5|Does not include firmware so rpi4 needs to have up to date firmware for this image to work!|
-|pi4|4|Includes firmware which enables the tryboot mechanism|
-|pi023|2, 3 and Zero 2 W|Uses u-boot|
-
+|tryboot|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader|
+|tryboot-containers|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader and with docker pre-installed|
+|rpi4|Raspberry Pi 4 image which includes the firmware to enable tryboot bootloader|
+|u-boot|Image for Raspberry Pi 2, 3, zero 2W|
+|u-boot-armhf|Image for Raspberry Pi 1 and zero|
 
 ## Building
 
-### Building an image without WIFI credentials (devices must have an ethernet adapter!)
+### Building an image
 
 To run the build tasks, install [just](https://just.systems/man/en/chapter_5.html).
 
-1. Create the image (including downloading the supported base Raspberry Pi image) using:
+1. Clone the repository
 
     ```sh
-    just VARIANT=pi45 build-all
+    git clone https://github.com/thin-edge/tedge-rugpi-image.git
     ```
 
-2. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
+2. Create a custom `.env` file which will be used to store secrets
 
-3. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
+    ```sh
+    cp env.template .env
+    ```
+
+    The `.env` file will not be committed to the repo
+
+3. Edit the `.env` file
+
+    If your device does not have an ethernet adapter, or you the device to connect to a Wifi network for onboarding, then you will have to add the Wifi credentials to the `.env` file.
+
+    ```sh
+    SECRETS_WIFI_SSID=example
+    SECRETS_WIFI_PASSWORD=yoursecurepassword
+    SSH_KEYS_bootstrap="ssh-rsa xxxxxxx"
+    ```
+
+    **Note**
+
+    The Wifi credentials only need to be included in the image that is flashed to the SD card. Subsequent images don't need to included the Wifi credentials, as the network connection configuration files are persisted across images.
+
+    If an image has Wifi credentials baked in, then you should not make this image public, as it would expose your credentials! 
+
+4. Create the image (including downloading the supported base Raspberry Pi image) using:
+
+    ```sh
+    just IMAGE=tryboot build
+    ```
+
+5. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
+
+6. Subsequent A/B updates can be done using Cumulocity IoT or the local Rugpi interface on (localhost:8088)
+
+    **Notes**
+
+    You can apply image updates via the device's localhost:8088 interface, however you will have to expand the `.xz` image file to a `.img` file.
 
 For further information on Rugpi, checkout the [quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
 
-### Building an image with WIFI credentials
 
-For devices that only support WIFI (e.g. don't have an ethernet adapter), the WIFI credentials are required to be part of the image, otherwise you don't have any way to connect via SSH to your device.
+### Building for your specific device type
 
-In the future this process will be looked to be improved, and potentially the standard raspberry pi way of using the wpa_supplicant will enable to work out of the box (so that you don't have to bake credentials into the image, and only add them when writing to flash).
+The different image options can be confusing, so to help users a few device specific tasks were created to help you pick the correct image.
 
-The default WIFI credentials are as follows, though it assumes that the given WIFI setup is a non-trusted network that is only used for bootstrapping, and then a secure WIFI network is configured.
-
-|SSID|Password|
-|----|--------|
-|onboarding_jail|onboarding_jail|
-
-1. Create the image (including downloading the supported base Raspberry Pi image) using:
-
-    ```sh
-    just PROFILE=wifi VARIANT=pi023 build-all
-    ```
-
-    Possible variants are:
-
-    * pi023
-    * pi4
-    * pi45
-
-    This profile will use pre-baked credentials for the WIFI which are defined in [profiles/wifi.toml](profiles/wifi.toml).
-
-### Building for Raspberry 1 or Zero
+#### Raspberry Pi 1
 
 ```sh
-just IMAGE_ARCH=armhf PROFILE=armhf VARIANT=pi01 build-all
+just build-pi1
+```
+
+#### Raspberry Pi 2
+
+```sh
+just build-pi2
+```
+
+#### Raspberry Pi 3
+
+```sh
+just build-pi3
+```
+
+#### Raspberry Pi 4 / 400
+
+```sh
+just build-pi4
+```
+
+**Note**
+
+All Raspberry Pi 4 and 400 don't support tryboot by default, and need their firmware updated before the `tryboot` image can be used.
+
+You can build an image which also includes the firmware used to enable tryboot. Afterwards you can switch back to using an image without the firmware included in it.
+
+```sh
+just build-pi4-include-firmware
+```
+
+#### Raspberry Pi 5
+
+```sh
+just build-pi5
+```
+
+#### Raspberry Pi Zero
+
+```sh
+just build-pizero
+```
+
+#### Raspberry Pi Zero 2W
+
+```sh
+just build-pizero2w
 ```
 
 ## Project Tasks
@@ -122,7 +166,7 @@ You will need [go-c8y-cli](https://goc8ycli.netlify.app/) and [gh](https://cli.g
 
 1. In the console, using go-c8y-cli, set your session to the tenant where you want to upload the firmware to
 
-    ```
+    ```sh
     set-session mytenant
     ```
 
@@ -143,3 +187,26 @@ You will need [go-c8y-cli](https://goc8ycli.netlify.app/) and [gh](https://cli.g
     This script will create firmware items (name and version) in Cumulocity IoT. The firmware versions will be just links to the external artifacts which are available from the Github Release artifacts.
 
 3. Now you can select the firmware in Cumulocity IoT to deploy to your devices (assuming you have flashed the base image to the device first ;)!
+
+## Add SSH and/or wifi to Github workflow
+
+You can customize the images built by the Github workflow by creating a secret within Github.
+
+1. Create a repository secret with the following settings
+
+    **Name**
+    
+    ```sh
+    IMAGE_CONFIG
+    ```
+
+    **Value**
+
+    ```sh
+    SSH_KEYS_bootstrap="ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx bootstrap"
+    SSH_KEYS_seconduser="ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx myseconduser"
+    ```
+
+    Remove any lines which are not applicable to your build.
+
+2. Build the workflow from Github using the UI (or creating a new git tag)

@@ -1,7 +1,0 @@
-description = "Add workflow scripts to support firmware updates"
-default = false
-priority = 10_000
-dependencies = ["thin-edge.io", "health-check"]
-
-[parameters]
-autorollback = { default = true }

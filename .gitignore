@@ -1,6 +1,6 @@
 /.rugpi
 /build
-recipes/build-info/files/.build_info
-**/debian-packages.list
-rugpi-bakery.toml
+.image
+*.sbom.txt
 *.log
+*.env

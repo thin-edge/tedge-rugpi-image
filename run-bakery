@@ -2,12 +2,28 @@
 
 set -e
 
-DOCKER=${DOCKER:-docker}
-RUGPI_IMAGE=${RUGPI_IMAGE:-ghcr.io/silitics/rugpi-bakery:v0.5}
+DOCKER=${DOCKER:-"docker"}
+DOCKER_FLAGS=${DOCKER_FLAGS:-""}
 
-$DOCKER run --rm --privileged \
+RUGPI_DEV=${RUGPI_DEV:-"false"}
+
+if [ "${RUGPI_DEV}" = "false" ]; then
+    DOCKER_FLAGS="${DOCKER_FLAGS} --pull always"
+    RUGPI_VERSION=${RUGPI_VERSION:-"v0.6"}
+else
+    RUGPI_VERSION=${RUGPI_VERSION:-"dev"}
+fi
+
+RUGPI_BAKERY_IMAGE=${RUGPI_BAKERY_IMAGE:-"ghcr.io/silitics/rugpi-bakery:${RUGPI_VERSION}"}
+
+if [ -t 0 ] && [ -t 1 ]; then
+    DOCKER_FLAGS="${DOCKER_FLAGS} -it"
+fi
+
+# shellcheck disable=SC2086
+exec $DOCKER run --rm --privileged \
+    $DOCKER_FLAGS \
     -v "$(pwd)":/project \
     -v /dev:/dev \
-    --pull always \
-    "$RUGPI_IMAGE" \
+    "${RUGPI_BAKERY_IMAGE}" \
     "$@"
