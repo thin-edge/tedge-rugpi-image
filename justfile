@@ -36,7 +36,7 @@ clean-all:
     @rm -Rf build/
 
 # Create the image that can be flashed to an SD card or applied using the rugpi interface
-build:
+build: setup
     mkdir -p "{{parent_directory(OUTPUT_IMAGE)}}"
     echo "{{IMAGE_NAME}}" > {{justfile_directory()}}/.image
     ./run-bakery bake image {{IMAGE}} {{OUTPUT_IMAGE}}
