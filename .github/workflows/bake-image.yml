@@ -44,10 +44,11 @@ jobs:
         job:
           - { image: pi4 }
           - { image: tryboot }
+          - { image: tryboot-containers }
           - { image: u-boot }
           - { image: u-boot-armhf }
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: extractions/setup-just@v1
