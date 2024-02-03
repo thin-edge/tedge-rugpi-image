@@ -1,6 +1,6 @@
 set dotenv-load
 
-export RUGPI_IMAGE := "ghcr.io/silitics/rugpi-bakery:feat-layers"
+export RUGPI_BAKERY_IMAGE := "ghcr.io/silitics/rugpi-bakery:v0.6"
 
 export PREFIX := "tedge_rugpi_"
 export IMAGE := "tryboot"
