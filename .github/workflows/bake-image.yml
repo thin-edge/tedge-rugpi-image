@@ -44,6 +44,7 @@ jobs:
         job:
           - { image: pi4 }
           - { image: tryboot }
+          - { image: tryboot-containers }
           - { image: u-boot }
           - { image: u-boot-armhf }
     steps:
