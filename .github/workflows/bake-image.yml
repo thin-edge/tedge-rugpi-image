@@ -108,3 +108,4 @@ jobs:
           draft: true
           files: |
             ./release/*/*
+            ./release/*/*/*
