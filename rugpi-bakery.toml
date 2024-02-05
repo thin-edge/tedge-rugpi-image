@@ -20,14 +20,17 @@ include_firmware = "pi4"
 [images.u-boot]
 layer = "default"
 boot_flow = "u-boot"
+include_firmware = "none"
 
 # An image using the U-Boot boot flow for Raspberry Pi 3 and Zero 2 with containerization dependencies
 [images.u-boot-containers]
 layer = "containers"
 boot_flow = "u-boot"
+include_firmware = "none"
 
 # An `armhf` image for older Raspberry Pi's using the U-Boot boot flow.
 [images.u-boot-armhf]
 layer = "default"
 architecture = "armhf"
 boot_flow = "u-boot"
+include_firmware = "none"
