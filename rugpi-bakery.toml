@@ -4,10 +4,12 @@ tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git" }
 # Image for Raspberry Pi 4, 5, CM4, 400
 [images.tryboot]
 layer = "default"
+include_firmware = "none"
 
 # Image for Raspberry Pi 4, 5, CM4, 400 - includes containerization dependencies
 [images.tryboot-containers]
 layer = "containers"
+include_firmware = "none"
 
 # A specific image including the firmware update for Raspberry Pi 4 and CM4.
 [images.pi4]
