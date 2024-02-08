@@ -24,6 +24,7 @@ publish_version() {
     filename=$(basename "$url")
     VERSION=$(echo "$filename" | sed 's/.img.xz$//' | rev | cut -d_ -f1 | rev)
     NAME=$(echo "$filename" | rev | cut -d_ -f2- | rev)
+    DEVICE_TYPE=$NAME
     #echo "name=$NAME, version=$VERSION, url=$url" >&2
 
     if [ -z "$NAME" ] || [ -z "$VERSION" ] || [ -z "$url" ]; then
@@ -31,10 +32,13 @@ publish_version() {
         return 1
     fi
 
-    # Create software name (if it does not already exist)
-    c8y firmware get -n --id "$NAME" --silentStatusCodes 404 >/dev/null || c8y firmware create -n --name "$NAME" --delay "1s" --force
-
     if [ -n "$NAME" ] && [ -n "$VERSION" ] && [ -n "$url" ]; then
+        # Create/Update firmware name (if it does not already exist)
+        if c8y firmware get -n --id "$NAME"  >/dev/null 2>&1; then
+            c8y firmware update -n --id "$NAME" --deviceType "$DEVICE_TYPE" --delay "1s" --force 
+        else
+            c8y firmware create -n --name "$NAME" --deviceType "$DEVICE_TYPE" --delay "1s" --force
+        fi
         # create version if it does not already exist
         if ! c8y firmware versions get -n --firmware "$NAME" --id "$VERSION" >/dev/null 2>&1; then
             c8y firmware versions create -n --firmware "$NAME" --version "$VERSION" --url "$url" --force
