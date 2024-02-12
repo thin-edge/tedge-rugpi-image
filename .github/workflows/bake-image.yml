@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: sudo snap install --edge --classic just
+      - uses: extractions/setup-just@v1
       - id: info
         name: Get Version
         run: |
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: sudo snap install --edge --classic just
+      - uses: extractions/setup-just@v1
       - name: Install dependencies
         run: just setup
       - id: info
