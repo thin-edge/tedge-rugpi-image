@@ -1,0 +1,6 @@
+description = "thin-edge.io custom configuration"
+priority = 10_000
+dependencies = ["tedge-rugpi-core/defaults"]
+
+[parameters]
+mqtt_bind_address = { default = "" }
