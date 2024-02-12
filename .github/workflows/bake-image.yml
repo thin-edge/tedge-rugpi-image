@@ -46,6 +46,7 @@ jobs:
           - { image: tryboot }
           - { image: tryboot-containers }
           - { image: u-boot }
+          - { image: u-boot-containers }
           - { image: u-boot-armhf }
     steps:
       - uses: actions/checkout@v4
