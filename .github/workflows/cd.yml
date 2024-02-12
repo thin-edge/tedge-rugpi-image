@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: extractions/setup-just@v1
+      - run: sudo snap install --edge --classic just
       - uses: reubenmiller/setup-go-c8y-cli@main
       - run: |
           echo "Name: ${{ github.event.release.name }} Description: ${{ github.event.release.body }}"
