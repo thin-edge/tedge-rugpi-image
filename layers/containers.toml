@@ -4,6 +4,7 @@ parent = "tedge-rugpi-core/tedge"
 recipes = [
     "tedge-rugpi-core/defaults",
     "tedge-rugpi-core/docker",
+    "tedge-config",
 ]
 
 [parameters."core/apt-cleanup"]
@@ -11,3 +12,7 @@ autoremove = true
 
 [parameters."core/rugpi-ctrl"]
 rugpi_admin = true  # Enable Rugpi Admin.
+
+[parameters."tedge-config"]
+# Allow containers to reach the MQTT broker on the host
+mqtt_bind_address = "0.0.0.0"
