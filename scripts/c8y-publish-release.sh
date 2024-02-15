@@ -7,19 +7,60 @@
 # * gh
 # * go-c8y-cli
 #
-if [ $# -eq 0 ]; then
-    echo "missing required positional argument: TAG" >&2
-    echo
-    echo "Usage:"
-    echo 
-    echo "    $0 <TAG> <PRERELEASE>=true/false "
-    echo 
-    echo "    <PRERELEASE> is optional to update a draft to a prerelease "
-    exit 1
+
+set -e
+
+help() {
+    cat << EOT
+Publish github releases
+
+USAGE
+    $0 <TAG> [OPTIONS]
+
+FLAGS
+    --pre-release       Publish release as a pre-release (only if it set to draft)
+
+EXAMPLES
+    $0 1.0.0 --pre-release
+
+EOT
+}
+
+# Defaults
+PRE_RELEASE=0
+
+# Parse arguments
+REST_ARGS=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            help
+            exit 0
+            ;;
+
+        --pre-release)
+            PRE_RELEASE=1
+            ;;
+
+        *)
+            REST_ARGS+=("$1")
+            ;;
+    esac
+    shift
+done
+
+# Only set if rest arguments are defined
+if [ ${#REST_ARGS[@]} -gt 0 ]; then
+    set -- "${REST_ARGS[@]}"
 fi
 
+TAG=
+if [ $# -eq 0 ]; then
+    echo "Missing required argument" >&2
+    help
+    exit 1
+fi
 TAG="$1"
-PRERELEASE="$2"
 
 publish_version() {
     url="$1"
@@ -51,12 +92,18 @@ publish_version() {
 }
 
 # Set from draft to pre-release
-if [ "$PRERELEASE" = "true" ]; then
+if [[ $PRE_RELEASE = 1 ]]; then
     IS_DRAFT=$(gh release view "$TAG" --json isDraft  --template "{{.isDraft}}")
     if [ "$IS_DRAFT" = "true" ]; then
+        echo "Update $TAG to prerelease."
         gh release edit --draft=false --prerelease "$TAG"
     fi
     sleep 3
+    IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --template "{{.isPrerelease}}")
+    if ! [ "$IS_PRERELEASE" = "true" ]; then
+        echo "Could not update $TAG to prerelease. Exiting."
+        exit 5
+    fi
 fi
 # Get assets from given tag
 FILES=$(gh release view "$TAG" --json assets --jq '.assets[].url' | grep ".xz")
