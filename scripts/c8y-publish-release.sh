@@ -11,13 +11,15 @@ if [ $# -eq 0 ]; then
     echo "missing required positional argument: TAG" >&2
     echo
     echo "Usage:"
-    echo
-    echo "    $0 <TAG>"
-    echo
+    echo 
+    echo "    $0 <TAG> <PRERELEASE>=true/false "
+    echo 
+    echo "    <PRERELEASE> is optional to update a draft to a prerelease "
     exit 1
 fi
 
 TAG="$1"
+PRERELEASE="$2"
 
 publish_version() {
     url="$1"
@@ -47,6 +49,13 @@ publish_version() {
         fi
     fi
 }
+
+# Set from draft to pre-release
+if ! [[ -z $(gh release list | grep $TAG | grep Draft) ]] && [[ $PRERELEASE = "true" ]]; then 
+    echo "Update Release from Draft to Pre-Release"
+    gh release edit --draft=false --prerelease $TAG 
+    sleep 3
+fi
 
 # Get assets from given tag
 FILES=$(gh release view "$TAG" --json assets --jq '.assets[].url' | grep ".xz")

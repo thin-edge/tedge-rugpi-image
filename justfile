@@ -68,6 +68,10 @@ publish:
 publish-external tag *args="":
     cd {{justfile_directory()}} && ./scripts/c8y-publish-release.sh {{tag}} {{args}}
 
+# Publish a given github release to Cumulocity (using external urls) but convert an existing draft to a prerelease beforehand
+publish-external-prerelease tag prerelease="true":
+    cd {{justfile_directory()}} && ./scripts/c8y-publish-release.sh {{tag}} {{prerelease}}
+
 # Trigger a release (by creating a tag)
 release:
     git tag -a "{{VERSION}}" -m "{{VERSION}}"
