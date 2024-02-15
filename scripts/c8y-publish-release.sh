@@ -91,18 +91,38 @@ publish_version() {
     fi
 }
 
+wait_for_released() {
+    #
+    # Wait for a Github release to transition away from the draft state (e.g. either prerelease or release)
+    #
+    tag="$1"
+    retries=5
+    attempt=0
+
+    # Note: using exit/return code convention, 1=not ok, 0=ok
+    success=1
+    while [ "$attempt" -lt "$retries" ]; do
+        if [ "$(gh release view "$tag" --json isDraft  --template "{{.isDraft}}")" = "false" ]; then
+            success=0
+            break
+        fi
+        attempt=$((attempt + 1))
+        echo "Waiting for release to be released..." >&2
+        sleep 3
+    done
+    return "$success"
+}
+
 # Set from draft to pre-release
-if [[ $PRE_RELEASE = 1 ]]; then
+if [ "$PRE_RELEASE" = 1 ]; then
     IS_DRAFT=$(gh release view "$TAG" --json isDraft  --template "{{.isDraft}}")
     if [ "$IS_DRAFT" = "true" ]; then
         echo "Update $TAG to prerelease."
         gh release edit --draft=false --prerelease "$TAG"
-    fi
-    sleep 3
-    IS_PRERELEASE=$(gh release view "$TAG" --json isPrerelease --template "{{.isPrerelease}}")
-    if ! [ "$IS_PRERELEASE" = "true" ]; then
-        echo "Could not update $TAG to prerelease. Exiting."
-        exit 5
+        if ! wait_for_released "$TAG"; then
+            echo "Could not update $TAG to prerelease. Exiting"
+            exit 5
+        fi
     fi
 fi
 # Get assets from given tag
