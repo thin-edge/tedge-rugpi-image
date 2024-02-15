@@ -51,12 +51,13 @@ publish_version() {
 }
 
 # Set from draft to pre-release
-if ! [[ -z $(gh release list | grep $TAG | grep Draft) ]] && [[ $PRERELEASE = "true" ]]; then 
-    echo "Update Release from Draft to Pre-Release"
-    gh release edit --draft=false --prerelease $TAG 
+if [ "$PRERELEASE" = "true" ]; then
+    IS_DRAFT=$(gh release view "$TAG" --json isDraft  --template "{{.isDraft}}")
+    if [ "$IS_DRAFT" = "true" ]; then
+        gh release edit --draft=false --prerelease "$TAG"
+    fi
     sleep 3
 fi
-
 # Get assets from given tag
 FILES=$(gh release view "$TAG" --json assets --jq '.assets[].url' | grep ".xz")
 
