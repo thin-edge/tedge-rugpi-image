@@ -7,16 +7,59 @@
 # * gh
 # * go-c8y-cli
 #
-if [ $# -eq 0 ]; then
-    echo "missing required positional argument: TAG" >&2
-    echo
-    echo "Usage:"
-    echo
-    echo "    $0 <TAG>"
-    echo
-    exit 1
+
+set -e
+
+help() {
+    cat << EOT
+Publish github releases
+
+USAGE
+    $0 <TAG> [OPTIONS]
+
+FLAGS
+    --pre-release       Publish release as a pre-release (only if it set to draft)
+
+EXAMPLES
+    $0 1.0.0 --pre-release
+
+EOT
+}
+
+# Defaults
+PRE_RELEASE=0
+
+# Parse arguments
+REST_ARGS=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            help
+            exit 0
+            ;;
+
+        --pre-release)
+            PRE_RELEASE=1
+            ;;
+
+        *)
+            REST_ARGS+=("$1")
+            ;;
+    esac
+    shift
+done
+
+# Only set if rest arguments are defined
+if [ ${#REST_ARGS[@]} -gt 0 ]; then
+    set -- "${REST_ARGS[@]}"
 fi
 
+TAG=
+if [ $# -eq 0 ]; then
+    echo "Missing required argument" >&2
+    help
+    exit 1
+fi
 TAG="$1"
 
 publish_version() {
@@ -48,6 +91,40 @@ publish_version() {
     fi
 }
 
+wait_for_released() {
+    #
+    # Wait for a Github release to transition away from the draft state (e.g. either prerelease or release)
+    #
+    tag="$1"
+    retries=5
+    attempt=0
+
+    # Note: using exit/return code convention, 1=not ok, 0=ok
+    success=1
+    while [ "$attempt" -lt "$retries" ]; do
+        if [ "$(gh release view "$tag" --json isDraft  --template "{{.isDraft}}")" = "false" ]; then
+            success=0
+            break
+        fi
+        attempt=$((attempt + 1))
+        echo "Waiting for release to be released..." >&2
+        sleep 3
+    done
+    return "$success"
+}
+
+# Set from draft to pre-release
+if [ "$PRE_RELEASE" = 1 ]; then
+    IS_DRAFT=$(gh release view "$TAG" --json isDraft  --template "{{.isDraft}}")
+    if [ "$IS_DRAFT" = "true" ]; then
+        echo "Update $TAG to prerelease."
+        gh release edit --draft=false --prerelease "$TAG"
+        if ! wait_for_released "$TAG"; then
+            echo "Could not update $TAG to prerelease. Exiting"
+            exit 5
+        fi
+    fi
+fi
 # Get assets from given tag
 FILES=$(gh release view "$TAG" --json assets --jq '.assets[].url' | grep ".xz")
 
