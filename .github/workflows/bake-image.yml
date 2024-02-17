@@ -48,6 +48,7 @@ jobs:
           - { image: u-boot }
           - { image: u-boot-containers }
           - { image: u-boot-armhf }
+          - { image: u-boot-armhf-containers }
     steps:
       - uses: actions/checkout@v4
         with:
