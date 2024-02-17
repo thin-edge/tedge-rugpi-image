@@ -34,3 +34,9 @@ layer = "default"
 architecture = "armhf"
 boot_flow = "u-boot"
 include_firmware = "none"
+
+[images.u-boot-armhf-containers]
+layer = "containers"
+architecture = "armhf"
+boot_flow = "u-boot"
+include_firmware = "none"
