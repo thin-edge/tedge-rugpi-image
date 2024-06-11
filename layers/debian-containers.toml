@@ -1,0 +1,14 @@
+parent = "tedge-rugpi-core/debian-bookworm-tedge"
+
+recipes = [
+    "tedge-rugpi-core/docker",
+    "core/rugpi-ctrl",
+    "tedge-config",
+]
+
+[parameters."core/rugpi-ctrl"]
+rugpi_admin = true  # Enable Rugpi Admin.
+
+[parameters."tedge-config"]
+# Allow containers to reach the MQTT broker on the host
+mqtt_bind_address = "0.0.0.0"

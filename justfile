@@ -1,6 +1,6 @@
 set dotenv-load
 
-export RUGPI_BAKERY_IMAGE := "ghcr.io/silitics/rugpi-bakery:v0.6"
+export RUGPI_BAKERY_IMAGE := "ghcr.io/silitics/rugpi-bakery:v0.7"
 
 export PREFIX := "tedge_rugpi_"
 export IMAGE := "tryboot"
@@ -84,7 +84,7 @@ release:
 # Help users to select the correct image for them
 #
 build-pi1:
-    just IMAGE=u-boot-armhf build
+    just IMAGE=rpi-u-boot-armhf build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi1"
@@ -93,7 +93,7 @@ build-pi1:
     @echo
 
 build-pizero:
-    just IMAGE=u-boot-armhf build
+    just IMAGE=rpi-u-boot-armhf build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi1"
@@ -102,7 +102,7 @@ build-pizero:
     @echo
 
 build-pi2:
-    just IMAGE=u-boot build
+    just IMAGE=rpi-u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -111,7 +111,7 @@ build-pi2:
     @echo
 
 build-pi3:
-    just IMAGE=u-boot build
+    just IMAGE=rpi-u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -120,7 +120,7 @@ build-pi3:
     @echo
 
 build-pizero2w:
-    just IMAGE=u-boot build
+    just IMAGE=rpi-u-boot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi2"
@@ -128,7 +128,7 @@ build-pizero2w:
     @echo
 
 build-pi4:
-    just IMAGE=tryboot build
+    just IMAGE=rpi-tryboot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
@@ -136,16 +136,28 @@ build-pi4:
     @echo
 
 build-pi4-include-firmware:
-    just IMAGE=pi4 build
+    just IMAGE=rpi-tryboot-pi4 build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
     @echo
 
 build-pi5:
-    just IMAGE=tryboot build
+    just IMAGE=rpi-tryboot build
     @echo
     @echo "This image can be applied to"
     @echo "  * pi4"
     @echo "  * pi5"
+    @echo
+
+build-debian-amd64-vm:
+    just IMAGE=debian-amd64-vm build
+    @echo
+    @echo "This image can be applied to any EFI-compatible device"
+    @echo
+
+build-debian-arm64-vm:
+    just IMAGE=debian-arm64-vm build
+    @echo
+    @echo "This image can be applied to any EFI-compatible device"
     @echo

@@ -1,0 +1,9 @@
+parent = "rpi-default"
+
+recipes = [
+    # Include firmware update for Rasbperry Pi 4.
+    "core/rpi-include-firmware",
+]
+
+[parameters."core/rpi-include-firmware"]
+model = "pi4"

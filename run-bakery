@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 DOCKER=${DOCKER:-"docker"}
 DOCKER_FLAGS=${DOCKER_FLAGS:-""}
@@ -9,7 +9,7 @@ RUGPI_DEV=${RUGPI_DEV:-"false"}
 
 if [ "${RUGPI_DEV}" = "false" ]; then
     DOCKER_FLAGS="${DOCKER_FLAGS} --pull always"
-    RUGPI_VERSION=${RUGPI_VERSION:-"v0.6"}
+    RUGPI_VERSION=${RUGPI_VERSION:-"v0.7"}
 else
     RUGPI_VERSION=${RUGPI_VERSION:-"dev"}
 fi
@@ -20,7 +20,6 @@ if [ -t 0 ] && [ -t 1 ]; then
     DOCKER_FLAGS="${DOCKER_FLAGS} -it"
 fi
 
-# shellcheck disable=SC2086
 exec $DOCKER run --rm --privileged \
     $DOCKER_FLAGS \
     -v "$(pwd)":/project \

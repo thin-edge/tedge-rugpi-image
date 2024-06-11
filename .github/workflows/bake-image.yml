@@ -42,13 +42,15 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { image: pi4 }
-          - { image: tryboot }
-          - { image: tryboot-containers }
-          - { image: u-boot }
-          - { image: u-boot-containers }
-          - { image: u-boot-armhf }
-          - { image: u-boot-armhf-containers }
+          - { image: rpi-tryboot }
+          - { image: rpi-tryboot-containers }
+          - { image: rpi-tryboot-pi4 }
+          - { image: rpi-u-boot }
+          - { image: rpi-u-boot-containers }
+          - { image: rpi-u-boot-armhf }
+          - { image: rpi-u-boot-armhf-containers }
+          - { image: debian-arm64 }
+          - { image: debian-amd64 }
     steps:
       - uses: actions/checkout@v4
         with:
