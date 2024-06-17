@@ -1,0 +1,8 @@
+parent = "tedge-rugpi-core/debian-bookworm-tedge"
+
+recipes = [
+    "core/rugpi-ctrl",
+]
+
+[parameters."core/rugpi-ctrl"]
+rugpi_admin = true

@@ -1,6 +1,7 @@
 description = "thin-edge.io custom configuration"
 priority = 10_000
-dependencies = ["tedge-rugpi-core/defaults"]
+# Thin-edge should be set up by the parent layer.
+dependencies = []
 
 [parameters]
 mqtt_bind_address = { default = "" }

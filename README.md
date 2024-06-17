@@ -24,13 +24,13 @@ The following images are included in this repository.
 
 |Image|Description|
 |-------|-----------|
-|tryboot|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader|
-|tryboot-containers|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader and with docker pre-installed|
-|rpi4|Raspberry Pi 4 image which includes the firmware to enable tryboot bootloader|
-|u-boot|Image for Raspberry Pi 2, 3, zero 2W|
-|u-boot-containers|Image for Raspberry Pi 2, 3, zero 2W with docker pre-installed|
-|u-boot-armhf|Image for Raspberry Pi 1 and zero|
-|u-boot-armhf-containers|Image for Raspberry Pi 1 and zero with docker pre-installed|
+|rpi-tryboot|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader|
+|rpi-tryboot-containers|Image for Raspberry Pi 4 and 5 devices which use the tryboot bootloader and with docker pre-installed|
+|rpi-tryboot-rpi4|Raspberry Pi 4 image which includes the firmware to enable tryboot bootloader|
+|rpi-u-boot|Image for Raspberry Pi 2, 3, zero 2W|
+|rpi-u-boot-containers|Image for Raspberry Pi 2, 3, zero 2W with docker pre-installed|
+|rpi-u-boot-armhf|Image for Raspberry Pi 1 and zero|
+|rpi-u-boot-armhf-containers|Image for Raspberry Pi 1 and zero with docker pre-installed|
 
 ## Building
 
