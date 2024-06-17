@@ -2,6 +2,7 @@ name: Bake Image
 permissions:
   contents: write
 on:
+  pull_request:
   workflow_dispatch:
   push:
     tags:
