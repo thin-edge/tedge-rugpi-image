@@ -141,6 +141,32 @@ just build-pizero
 just build-pizero2w
 ```
 
+### Building image with pre-release versions
+
+To build an image with the latest pre-release version from the [main channel](https://thin-edge.github.io/thin-edge.io/contribute/package-hosting/#pre-releases), these additional steps are required before building the image:
+
+1. Clone the `tedge-rugpi-core` repository inside the `tedge-rugpi-image` repo directory cloned in the previous step
+
+    ```sh
+    git clone https://github.com/thin-edge/tedge-rugpi-core.git
+    ```
+
+2. Inside this repo change the `channel` key value in `recipes/thin-edge.io/recipe.toml` from `release` to `main`:
+
+    ```toml
+    channel = { default = "main" }
+    ```
+
+3. Update the `[repositories]` reference in the `rugpi-bakery.toml` at the root of the `tedge-rugpi-image` repository
+   to point to the relative path of the local clone of the `tedge-rugpi-core` repo:
+
+    ```toml
+    [repositories]
+    tedge-rugpi-core = { path = "tedge-rugpi-core"}
+    ```
+
+4. Build the image using any one of the `just build-xxx` commands described in the previous section.
+
 ## Project Tasks
 
 ### Publishing a new release
