@@ -23,6 +23,7 @@ fi
 exec $DOCKER run --rm --privileged \
     $DOCKER_FLAGS \
     -v "$(pwd)":/project \
+    -v "$(pwd)/.gitconfig:/root/.gitconfig" \
     -v /dev:/dev \
     "${RUGPI_BAKERY_IMAGE}" \
     "$@"
