@@ -85,6 +85,15 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 For further information on Rugpi, checkout the [quick start guide](https://oss.silitics.com/rugpi/docs/getting-started).
 
 
+### Building images including thin-edge.io main
+
+To build an image with the latest pre-release version from the [main channel](https://thin-edge.github.io/thin-edge.io/contribute/package-hosting/#pre-releases), set the following environment variable in the `.env` file in your project:
+
+```sh
+# thin-edge.io install channel. Options: "main",  "release" (latest official release)
+TEDGE_INSTALL_CHANNEL=main
+```
+
 ### Building for your specific device type
 
 The different image options can be confusing, so to help users a few device specific tasks were created to help you pick the correct image.
