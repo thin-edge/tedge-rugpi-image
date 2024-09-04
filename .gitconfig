@@ -1,0 +1,4 @@
+[safe]
+    # Ignore the safe directories when building inside a container as the ownership
+    # of the repository folders can be unexpected
+    directory = *
