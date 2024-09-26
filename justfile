@@ -107,7 +107,7 @@ build-pi2:
     @echo "This image can be applied to"
     @echo "  * pi2"
     @echo "  * pi3"
-    @echo "  * pizero2"
+    @echo "  * pizero2w"
     @echo
 
 build-pi3:
@@ -116,7 +116,7 @@ build-pi3:
     @echo "This image can be applied to"
     @echo "  * pi2"
     @echo "  * pi3"
-    @echo "  * pizero2"
+    @echo "  * pizero2w"
     @echo
 
 build-pizero2w:
@@ -125,6 +125,7 @@ build-pizero2w:
     @echo "This image can be applied to"
     @echo "  * pi2"
     @echo "  * pi3"
+    @echo "  * pizero2w"
     @echo
 
 build-pi4:
