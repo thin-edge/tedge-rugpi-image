@@ -3,6 +3,8 @@ parent = "tedge-rugpi-core/raspios-tedge"
 recipes = [
     "core/rugpi-ctrl",
     "tedge-rugpi-core/docker",
+    "tedge-rugpi-core/systemd-resolved",
+    "tedge-rugpi-core/boot-options",
     "tedge-config",
 ]
 

@@ -1,8 +1,10 @@
 parent = "tedge-rugpi-core/debian-bookworm-tedge"
 
 recipes = [
-    "tedge-rugpi-core/docker",
     "core/rugpi-ctrl",
+    "tedge-rugpi-core/docker",
+    "tedge-rugpi-core/systemd-resolved",
+    "tedge-rugpi-core/boot-options",
     "tedge-config",
 ]
 
