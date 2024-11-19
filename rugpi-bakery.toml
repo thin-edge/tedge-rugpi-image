@@ -1,5 +1,5 @@
 [repositories]
-tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git", branch = "v0.8" }
+tedge-rugpi-core = { git = "https://github.com/thin-edge/tedge-rugpi-core.git", branch = "feat-tedge-container-plugin-ng" }
 
 [images.debian-amd64]
 layer = "debian-default"
