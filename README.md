@@ -71,7 +71,13 @@ To run the build tasks, install [just](https://just.systems/man/en/chapter_5.htm
 4. Create the image (including downloading the supported base Raspberry Pi image) using:
 
     ```sh
-    just IMAGE=tryboot build
+    just build-pi4
+    ```
+
+    Alternatively, you can use any of the image names defined in the `rugpi-bakery.toml` file, where the image name is part of the `images.*` key. For example, for `images.rpi-tryboot-containers`, the `IMAGE` name would be `rpi-tryboot`. You can then build the image using the following command:
+
+    ```sh
+    just IMAGE=rpi-tryboot-containers build
     ```
 
 5. Using the path to the image shown in the console to flash the image to the Raspberry Pi.
